@@ -62,7 +62,9 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         api group: 'io.github.libktx', name: 'ktx-actors', version: ktxVersion
+        api group: 'io.github.libktx', name: 'ktx-app', version: ktxVersion
         api group: 'io.github.libktx', name: 'ktx-assets', version: ktxVersion
         api group: 'io.github.libktx', name: 'ktx-scene2d', version: ktxVersion
+        api group: 'io.github.libktx', name: 'ktx-style', version: ktxVersion
     }
 }
