@@ -1,17 +1,23 @@
 package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+import com.badlogic.gdx.utils.Align
 import com.tangledwebgames.masterofdoors.HEALTH_BAR_STYLE
 import com.tangledwebgames.masterofdoors.MANA_BAR_STYLE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
+import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
 import com.tangledwebgames.masterofdoors.skin
 import com.tangledwebgames.masterofdoors.util.textProperty
 import ktx.actors.onClick
+import ktx.actors.then
 import ktx.scene2d.*
 import ktx.style.get
+import kotlin.math.pow
 import kotlin.properties.Delegates
 
 class BattleScreenView(private val stage: Stage) {
@@ -66,6 +72,9 @@ class BattleScreenView(private val stage: Stage) {
         }
     )
 
+    private val logScrollPane: ScrollPane
+    private val logVerticalGroup: KVerticalGroup
+
     private val menuContainer: Container<KVerticalGroup>
 
     init {
@@ -75,6 +84,20 @@ class BattleScreenView(private val stage: Stage) {
                 pad(PADDING_LARGE)
                 defaults().space(PADDING_LARGE)
 
+                row().height(180f).colspan(2)
+                scrollPane {
+                    it.fillY().width(500f)
+                    logScrollPane = this
+                    setScrollingDisabled(true, false)
+                    verticalGroup {
+                        logVerticalGroup = this
+                        bottom()
+                        grow()
+                        space(PADDING_SMALL)
+                    }
+                }
+
+
                 row().expand()
                 horizontalGroup { cell ->
                     cell.colspan(2)
@@ -82,7 +105,7 @@ class BattleScreenView(private val stage: Stage) {
                     space(PADDING_LARGE)
 
                     table {
-                        defaults().space(PADDING_SMALL)
+                        defaults().space(PADDING_MEDIUM)
 
                         label("") {
                             it.left()
@@ -95,7 +118,7 @@ class BattleScreenView(private val stage: Stage) {
 
                     table {
                         enemyTwoTable = this
-                        defaults().space(PADDING_SMALL)
+                        defaults().space(PADDING_MEDIUM)
 
                         label("") {
                             it.left()
@@ -111,8 +134,8 @@ class BattleScreenView(private val stage: Stage) {
                 table { cell ->
                     cell.right()
                     background = skin["panel"]
-                    pad(PADDING_SMALL)
-                    defaults().space(PADDING_SMALL)
+                    pad(PADDING_MEDIUM)
+                    defaults().space(PADDING_MEDIUM)
 
                     label("") {
                         it.left()
@@ -129,8 +152,8 @@ class BattleScreenView(private val stage: Stage) {
                 table { cell ->
                     cell.left()
                     background = skin["panel"]
-                    pad(PADDING_SMALL)
-                    defaults().space(PADDING_SMALL)
+                    pad(PADDING_MEDIUM)
+                    defaults().space(PADDING_MEDIUM)
 
                     label("") {
                         it.left()
@@ -151,10 +174,10 @@ class BattleScreenView(private val stage: Stage) {
                 container(KVerticalGroup()) {
                     it.expand().bottom().left()
                     background = this@table.skin["panel"]
-                    fillX().bottom().pad(PADDING_SMALL).prefWidth(300f)
+                    fillX().bottom().pad(PADDING_MEDIUM).prefWidth(300f)
                     actor.apply {
                         grow()
-                        space(PADDING_SMALL)
+                        space(PADDING_MEDIUM)
                     }
                     menuContainer = this
                 }
@@ -217,5 +240,39 @@ class BattleScreenView(private val stage: Stage) {
     inline fun setMenu(items: List<BattleMenuItem>, crossinline onClick: (String) -> Unit) {
         menuItems = items
         onMenuItemClick = { onClick(it) }
+    }
+
+    var numLogItems: Int by Delegates.observable(10) { _, _, _ ->
+        checkRemoveLogItems()
+    }
+
+    private fun checkRemoveLogItems() {
+        while (numLogItems < logVerticalGroup.children.size) {
+            logVerticalGroup.removeActorAt(0, true).also {
+                logScrollPane.scrollY -= it.height + logVerticalGroup.space
+            }
+        }
+        logScrollPane.updateVisualScroll()
+        logVerticalGroup.children.reversed().forEachIndexed { index, actor ->
+            actor.clearActions()
+            actor.addAction(
+                Actions.alpha(
+                    ((numLogItems - index).toFloat() / numLogItems).pow(2),
+                    0.5f
+                )
+            )
+        }
+    }
+
+    fun pushLogItem(text: String) {
+        logVerticalGroup.label(text).apply {
+            wrap = true
+            setAlignment(Align.center)
+        }
+        checkRemoveLogItems()
+        val action = Actions.delay(0.02f) then Actions.run {
+            logScrollPane.scrollPercentY = 1f
+        }
+        logScrollPane.addAction(action)
     }
 }

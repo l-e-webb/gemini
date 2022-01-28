@@ -28,6 +28,7 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
             enemyTwoMaxHealth = 1000
             enemyTwoCurrentHealth = 1000
 
+            var i = 0
             setMenu(listOf(
                 BattleMenuItem("Attack", "attack"),
                 BattleMenuItem("Skill", "skill"),
@@ -35,6 +36,8 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
             )) {
                 characterOneCurrentHealth -= 5
                 showEnemyTwo = !showEnemyTwo
+                pushLogItem("Log item $i")
+                i++
             }
         }
     }

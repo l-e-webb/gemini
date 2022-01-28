@@ -7,7 +7,9 @@ object UiConstants {
     const val SCREEN_HEIGHT = 1000
 
     const val PADDING_LARGE = 16f
-    const val PADDING_SMALL = 8f
+    const val PADDING_MEDIUM = 8f
+    const val PADDING_SMALL = 4f
+    const val PADDING_X_SMALL = 2f
 
     const val HEALTH_BAR_WIDTH = 300f
     const val HEALTH_BAR_HEIGHT = 20f
