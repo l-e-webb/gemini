@@ -6,9 +6,11 @@ import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
 
+    private lateinit var view: BattleScreenView
+
     override fun show() {
         stage.clear()
-        battleScreenView(stage)
+        view = BattleScreenView(stage)
     }
 
     override fun render(delta: Float) {
