@@ -2,6 +2,7 @@ package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.tangledwebgames.masterofdoors.DAMAGE_POPUP_STYLE
 import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
@@ -11,7 +12,7 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
     override fun show() {
         stage.clear()
         view = BattleScreenView(stage).apply {
-            characterOneName = "Alpha"
+            characterOneName = "Alpha 5"
             characterOneMaxHealth = 75
             characterOneCurrentHealth = 75
             characterOneMaxMana = 20
@@ -37,6 +38,7 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
                 characterOneCurrentHealth -= 5
                 showEnemyTwo = !showEnemyTwo
                 pushLogItem("Log item $i")
+                showPopupText("c1", "5", DAMAGE_POPUP_STYLE)
                 i++
             }
         }

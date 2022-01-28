@@ -15,6 +15,20 @@ object UiConstants {
     const val HEALTH_BAR_HEIGHT = 20f
     const val HEALTH_BAR_PADDING = 2f
 
+    const val BATTLE_POPUP_INITIAL_SCALE = 0.5f
+    const val BATTLE_POPUP_INITIAL_ALPHA = 0.5f
+    const val BATTLE_POPUP_SCALE_UP_TIME = 0.5f
+    const val BATTLE_POPUP_FADE_IN_TIME = 0.25f
+    const val BATTLE_POPUP_VERTICAL_SHIFT = 100f
+    const val BATTLE_POPUP_SHIFT_TIME = 0.5f
+    const val BATTLE_POPUP_WAIT_TIME = 0.75f
+    const val BATTLE_POPUP_FADE_TIME = 0.25f
+    const val BATTLE_POPUP_FONT_SIZE = 48
+
     val HEALTH_BAR_COLOR: Color = Color(0x20ff20ff)
     val MANA_BAR_COLOR: Color = Color(0x1020ffff)
+
+    val DAMAGE_POPUP_COLOR: Color = Color(0xff2020ff.toInt())
+    val HEALING_POPUP_COLOR: Color = HEALTH_BAR_COLOR
+    val GENERIC_POPUP_COLOR: Color = Color.LIGHT_GRAY
 }
