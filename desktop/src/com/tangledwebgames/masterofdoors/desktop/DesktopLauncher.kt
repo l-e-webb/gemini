@@ -1,8 +1,7 @@
 package com.tangledwebgames.masterofdoors.desktop
 
-import kotlin.jvm.JvmStatic
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.tangledwebgames.masterofdoors.MasterOfDoorsGame
 import com.tangledwebgames.masterofdoors.UiConstants
 

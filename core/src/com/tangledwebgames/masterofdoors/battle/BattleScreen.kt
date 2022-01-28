@@ -12,20 +12,22 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
         stage.clear()
         view = BattleScreenView(stage).apply {
             characterOneName = "Alpha"
-            characterOneHealthPercentage = 1f
-            characterOneManaPercentage = 1f
+            characterOneMaxHealth = 75
+            characterOneCurrentHealth = 75
+            characterOneMaxMana = 20
+            characterOneCurrentMana = 0
             characterTwoName = "Omega"
-            characterTwoHealthPercentage = 0.5f
-            characterTwoManaPercentage = 0f
+            characterTwoMaxHealth = 50
+            characterTwoCurrentHealth = 25
+            characterTwoMaxMana = 25
+            characterTwoCurrentMana = 20
 
-            menuItems = listOf(
+            setMenu(listOf(
                 BattleMenuItem("Attack", "attack"),
                 BattleMenuItem("Skill", "skill"),
                 BattleMenuItem("Spell", "spell")
-            )
-
-            onMenuItemClick = {
-                characterOneHealthPercentage -= 0.1f
+            )) {
+                characterOneCurrentHealth -= 5
             }
         }
     }

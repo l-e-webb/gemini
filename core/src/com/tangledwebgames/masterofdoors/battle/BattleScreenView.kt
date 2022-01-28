@@ -3,13 +3,8 @@ package com.tangledwebgames.masterofdoors.battle
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.tangledwebgames.masterofdoors.HEALTH_BAR_STYLE
 import com.tangledwebgames.masterofdoors.MANA_BAR_STYLE
-import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_HEIGHT
-import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_PADDING
-import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_WIDTH
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
 import com.tangledwebgames.masterofdoors.skin
@@ -22,16 +17,39 @@ import kotlin.properties.Delegates
 class BattleScreenView(private val stage: Stage) {
 
     private val characterOneNameLabel: Label
-    private val characterOneHealthBar: ProgressBar
-    private val characterOneManaBar: ProgressBar
+    private val characterOneHealthBar: HealthBar = HealthBar(
+        labelStyle = "sub-title",
+        progressBarStyle = HEALTH_BAR_STYLE,
+        labelGenerator = { current, max ->
+            "Health: $current / $max"
+        }
+    )
+    private val characterOneManaBar: HealthBar = HealthBar(
+        labelStyle = "sub-title",
+        progressBarStyle = MANA_BAR_STYLE,
+        labelGenerator = { current, max ->
+            "Mana: $current / $max"
+        }
+    )
     private val characterTwoNameLabel: Label
-    private val characterTwoHealthBar: ProgressBar
-    private val characterTwoManaBar: ProgressBar
+    private val characterTwoHealthBar: HealthBar = HealthBar(
+        labelStyle = "sub-title",
+        progressBarStyle = HEALTH_BAR_STYLE,
+        labelGenerator = { current, max ->
+            "Health: $current / $max"
+        }
+    )
+    private val characterTwoManaBar: HealthBar = HealthBar(
+        labelStyle = "sub-title",
+        progressBarStyle = MANA_BAR_STYLE,
+        labelGenerator = { current, max ->
+            "Mana: $current / $max"
+        }
+    )
 
     private val menuContainer: Container<KVerticalGroup>
 
     init {
-        val healthBarBg: NinePatchDrawable = skin["health-bar-bg"]
         stage.actors {
             table {
                 setFillParent(true)
@@ -50,26 +68,10 @@ class BattleScreenView(private val stage: Stage) {
                     }
 
                     row()
-                    container {
-                        it.width(HEALTH_BAR_WIDTH).height(HEALTH_BAR_HEIGHT).grow()
-                        background = healthBarBg
-                        fill().pad(HEALTH_BAR_PADDING)
-
-                        progressBar(style = HEALTH_BAR_STYLE) {
-                            characterOneHealthBar = this
-                        }
-                    }
+                    actor(characterOneHealthBar.rootTable)
 
                     row()
-                    container {
-                        it.width(HEALTH_BAR_WIDTH).height(HEALTH_BAR_HEIGHT).grow()
-                        background = healthBarBg
-                        fill().pad(HEALTH_BAR_PADDING)
-
-                        progressBar(style = MANA_BAR_STYLE) {
-                            characterOneManaBar = this
-                        }
-                    }
+                    actor(characterOneManaBar.rootTable)
                 }
 
                 table {
@@ -83,26 +85,10 @@ class BattleScreenView(private val stage: Stage) {
                     }
 
                     row()
-                    container {
-                        it.width(HEALTH_BAR_WIDTH).height(HEALTH_BAR_HEIGHT).grow()
-                        background = healthBarBg
-                        fill().pad(HEALTH_BAR_PADDING)
-
-                        progressBar(style = HEALTH_BAR_STYLE) {
-                            characterTwoHealthBar = this
-                        }
-                    }
+                    actor(characterTwoHealthBar.rootTable)
 
                     row()
-                    container {
-                        it.width(HEALTH_BAR_WIDTH).height(HEALTH_BAR_HEIGHT).grow()
-                        background = healthBarBg
-                        fill().pad(HEALTH_BAR_PADDING)
-
-                        progressBar(style = MANA_BAR_STYLE) {
-                            characterTwoManaBar = this
-                        }
-                    }
+                    actor(characterTwoManaBar.rootTable)
                 }
             }
 
@@ -122,12 +108,16 @@ class BattleScreenView(private val stage: Stage) {
     }
 
     var characterOneName: String by characterOneNameLabel.textProperty()
-    var characterOneHealthPercentage: Float by characterOneHealthBar::value
-    var characterOneManaPercentage: Float by characterOneManaBar::value
+    var characterOneCurrentHealth: Int by characterOneHealthBar::currentValue
+    var characterOneMaxHealth: Int by characterOneHealthBar::maxValue
+    var characterOneCurrentMana: Int by characterOneManaBar::currentValue
+    var characterOneMaxMana: Int by characterOneManaBar::maxValue
 
     var characterTwoName: String by characterTwoNameLabel.textProperty()
-    var characterTwoHealthPercentage: Float by characterTwoHealthBar::value
-    var characterTwoManaPercentage: Float by characterTwoManaBar::value
+    var characterTwoCurrentHealth: Int by characterTwoHealthBar::currentValue
+    var characterTwoMaxHealth: Int by characterTwoHealthBar::maxValue
+    var characterTwoCurrentMana: Int by characterTwoManaBar::currentValue
+    var characterTwoMaxMana: Int by characterTwoManaBar::maxValue
 
     var onMenuItemClick: (String) -> Unit = {}
 
@@ -138,7 +128,7 @@ class BattleScreenView(private val stage: Stage) {
                 for (item in new) {
                     textButton(item.text) {
                         onClick {
-                            onMenuItemClickInner(item.id)
+                            onMenuItemClick(item.id)
                         }
                     }
                 }
@@ -152,5 +142,8 @@ class BattleScreenView(private val stage: Stage) {
         }
     }
 
-    private fun onMenuItemClickInner(itemId: String) = onMenuItemClick(itemId)
+    inline fun setMenu(items: List<BattleMenuItem>, crossinline onClick: (String) -> Unit) {
+        menuItems = items
+        onMenuItemClick = { onClick(it) }
+    }
 }
