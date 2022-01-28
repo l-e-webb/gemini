@@ -47,6 +47,25 @@ class BattleScreenView(private val stage: Stage) {
         }
     )
 
+    private val enemyHorizontalGroup: KHorizontalGroup
+    private val enemyOneNameLabel: Label
+    private val enemyOneHealthBar: HealthBar = HealthBar(
+        labelStyle = "sub-title",
+        progressBarStyle = HEALTH_BAR_STYLE,
+        labelGenerator = { current, max ->
+            "Health: $current / $max"
+        }
+    )
+    private val enemyTwoTable: KTableWidget
+    private val enemyTwoNameLabel: Label
+    private val enemyTwoHealthBar: HealthBar = HealthBar(
+        labelStyle = "sub-title",
+        progressBarStyle = HEALTH_BAR_STYLE,
+        labelGenerator = { current, max ->
+            "Health: $current / $max"
+        }
+    )
+
     private val menuContainer: Container<KVerticalGroup>
 
     init {
@@ -56,8 +75,41 @@ class BattleScreenView(private val stage: Stage) {
                 pad(PADDING_LARGE)
                 defaults().space(PADDING_LARGE)
 
-                row().expandY().bottom()
-                table {
+                row().expand()
+                horizontalGroup { cell ->
+                    cell.colspan(2)
+                    enemyHorizontalGroup = this
+                    space(PADDING_LARGE)
+
+                    table {
+                        defaults().space(PADDING_SMALL)
+
+                        label("") {
+                            it.left()
+                            enemyOneNameLabel = this
+                        }
+
+                        row()
+                        actor(enemyOneHealthBar.rootTable)
+                    }
+
+                    table {
+                        enemyTwoTable = this
+                        defaults().space(PADDING_SMALL)
+
+                        label("") {
+                            it.left()
+                            enemyTwoNameLabel = this
+                        }
+
+                        row()
+                        actor(enemyTwoHealthBar.rootTable)
+                    }
+                }
+
+                row()
+                table { cell ->
+                    cell.right()
                     background = skin["panel"]
                     pad(PADDING_SMALL)
                     defaults().space(PADDING_SMALL)
@@ -74,7 +126,8 @@ class BattleScreenView(private val stage: Stage) {
                     actor(characterOneManaBar.rootTable)
                 }
 
-                table {
+                table { cell ->
+                    cell.left()
                     background = skin["panel"]
                     pad(PADDING_SMALL)
                     defaults().space(PADDING_SMALL)
@@ -94,8 +147,10 @@ class BattleScreenView(private val stage: Stage) {
 
             table {
                 setFillParent(true)
+                pad(PADDING_LARGE)
                 container(KVerticalGroup()) {
                     it.expand().bottom().left()
+                    background = this@table.skin["panel"]
                     fillX().bottom().pad(PADDING_SMALL).prefWidth(300f)
                     actor.apply {
                         grow()
@@ -118,6 +173,23 @@ class BattleScreenView(private val stage: Stage) {
     var characterTwoMaxHealth: Int by characterTwoHealthBar::maxValue
     var characterTwoCurrentMana: Int by characterTwoManaBar::currentValue
     var characterTwoMaxMana: Int by characterTwoManaBar::maxValue
+
+    var enemyOneName: String by enemyOneNameLabel.textProperty()
+    var enemyOneCurrentHealth: Int by enemyOneHealthBar::currentValue
+    var enemyOneMaxHealth: Int by enemyOneHealthBar::maxValue
+    var enemyTwoName: String by enemyTwoNameLabel.textProperty()
+    var enemyTwoCurrentHealth: Int by enemyTwoHealthBar::currentValue
+    var enemyTwoMaxHealth: Int by enemyTwoHealthBar::maxValue
+
+    var showEnemyTwo: Boolean by Delegates.observable(true) { _, old, new ->
+        if (old != new) {
+            if (new) {
+                enemyHorizontalGroup.addActor(enemyTwoTable)
+            } else {
+                enemyHorizontalGroup.removeActor(enemyTwoTable)
+            }
+        }
+    }
 
     var onMenuItemClick: (String) -> Unit = {}
 

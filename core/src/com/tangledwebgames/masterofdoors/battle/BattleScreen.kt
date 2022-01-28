@@ -21,6 +21,12 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
             characterTwoCurrentHealth = 25
             characterTwoMaxMana = 25
             characterTwoCurrentMana = 20
+            enemyOneName = "Janus - Left"
+            enemyOneMaxHealth = 1000
+            enemyOneCurrentHealth = 500
+            enemyTwoName = "Janus - Right"
+            enemyTwoMaxHealth = 1000
+            enemyTwoCurrentHealth = 1000
 
             setMenu(listOf(
                 BattleMenuItem("Attack", "attack"),
@@ -28,6 +34,7 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
                 BattleMenuItem("Spell", "spell")
             )) {
                 characterOneCurrentHealth -= 5
+                showEnemyTwo = !showEnemyTwo
             }
         }
     }

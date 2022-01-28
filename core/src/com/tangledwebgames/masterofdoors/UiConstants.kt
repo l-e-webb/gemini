@@ -9,8 +9,8 @@ object UiConstants {
     const val PADDING_LARGE = 16f
     const val PADDING_SMALL = 8f
 
-    const val HEALTH_BAR_WIDTH = 200f
-    const val HEALTH_BAR_HEIGHT = 16f
+    const val HEALTH_BAR_WIDTH = 300f
+    const val HEALTH_BAR_HEIGHT = 20f
     const val HEALTH_BAR_PADDING = 2f
 
     val HEALTH_BAR_COLOR: Color = Color(0x20ff20ff)
