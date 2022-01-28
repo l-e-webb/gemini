@@ -36,5 +36,6 @@ class MasterOfDoorsGame : Game() {
 
     override fun dispose() {
         stage?.dispose()
+        Assets.dispose()
     }
 }
