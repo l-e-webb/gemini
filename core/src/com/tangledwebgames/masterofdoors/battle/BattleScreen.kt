@@ -10,7 +10,24 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
 
     override fun show() {
         stage.clear()
-        view = BattleScreenView(stage)
+        view = BattleScreenView(stage).apply {
+            characterOneName = "Alpha"
+            characterOneHealthPercentage = 1f
+            characterOneManaPercentage = 1f
+            characterTwoName = "Omega"
+            characterTwoHealthPercentage = 0.5f
+            characterTwoManaPercentage = 0f
+
+            menuItems = listOf(
+                BattleMenuItem("Attack", "attack"),
+                BattleMenuItem("Skill", "skill"),
+                BattleMenuItem("Spell", "spell")
+            )
+
+            onMenuItemClick = {
+                characterOneHealthPercentage -= 0.1f
+            }
+        }
     }
 
     override fun render(delta: Float) {

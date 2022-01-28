@@ -1,13 +1,12 @@
 package com.tangledwebgames.masterofdoors
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_COLOR
 import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_HEIGHT
 import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_PADDING
+import com.tangledwebgames.masterofdoors.UiConstants.MANA_BAR_COLOR
 import ktx.style.add
 import ktx.style.progressBar
 
@@ -24,34 +23,37 @@ val skin: Skin by lazy {
 }
 
 private fun initSkin(skin: Skin) = with(skin) {
-    add(getDrawable("button-c"), "panel")
+    add(newDrawable("button-c"), "panel")
 
-    val healthBarBg = newDrawable("panel")
+    newDrawable("panel")
         ?.let { it as? NinePatchDrawable }
         ?.apply {
-            minHeight = HEALTH_BAR_HEIGHT
-            topHeight = HEALTH_BAR_PADDING
-            bottomHeight = HEALTH_BAR_PADDING
             leftWidth = HEALTH_BAR_PADDING
             rightWidth = HEALTH_BAR_PADDING
+            topHeight = HEALTH_BAR_PADDING
+            rightWidth = HEALTH_BAR_PADDING
+            minHeight = HEALTH_BAR_HEIGHT
+        }?.also {
+            add(it, "health-bar-bg")
         }
+
     progressBar(HEALTH_BAR_STYLE) {
-        background = healthBarBg
         knobBefore = newDrawable("progress-bar-c")
             ?.let { it as? SpriteDrawable }
-            ?.tint(Color.GREEN)
+            ?.tint(HEALTH_BAR_COLOR)
             ?.apply {
                 minHeight = HEALTH_BAR_HEIGHT - HEALTH_BAR_PADDING * 2
+                minWidth = 0f
             }
     }
 
     progressBar(MANA_BAR_STYLE) {
-        background = healthBarBg
         knobBefore = newDrawable("progress-bar-c")
             ?.let { it as? SpriteDrawable }
-            ?.tint(Color.BLUE)
+            ?.tint(MANA_BAR_COLOR)
             ?.apply {
                 minHeight = HEALTH_BAR_HEIGHT - HEALTH_BAR_PADDING * 2
+                minWidth = 0f
             }
     }
 }
