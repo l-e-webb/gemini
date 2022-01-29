@@ -8,6 +8,7 @@ import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_TWO_
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_ONE_ID
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_TWO_ID
 import com.tangledwebgames.masterofdoors.battle.model.Battler
+import com.tangledwebgames.masterofdoors.battle.model.actions.NonAction
 import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
@@ -20,11 +21,13 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
         stage.clear()
         view = BattleScreenView(stage)
         battle = Battle(
-            Battler(PLAYER_ONE_ID, "Player One"),
-            Battler(PLAYER_TWO_ID, "Player Two"),
-            Battler(ENEMY_ONE_ID, "Enemy One"),
-            Battler(ENEMY_TWO_ID, "Enemy Two")
+            Battler(PLAYER_ONE_ID, "Player One", isEnemy = false),
+            Battler(PLAYER_TWO_ID, "Player Two", isEnemy = false),
+            Battler(ENEMY_ONE_ID, "Enemy One", isEnemy = true),
+            Battler(ENEMY_TWO_ID, "Enemy Two", isEnemy = true)
         )
+        battle.playerBattlerOne.skills.add(NonAction())
+        battle.playerBattlerTwo.skills.add(NonAction())
         presenter = BattlePresenter(view, battle)
         battle.begin()
     }

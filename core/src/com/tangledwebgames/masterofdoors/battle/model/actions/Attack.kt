@@ -12,6 +12,8 @@ class Attack: BattleAction {
     companion object {
         const val ATTACK_ID = "attack"
         const val NAME = "Attack"
+
+        val instance: Attack = Attack()
     }
 
     override val id: String = ATTACK_ID

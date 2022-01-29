@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.tangledwebgames.masterofdoors.battle.model.Battle
+import com.tangledwebgames.masterofdoors.battle.model.BattleAction
 import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
 import com.tangledwebgames.masterofdoors.battle.model.actions.Attack
 import ktx.actors.then
@@ -18,14 +19,16 @@ class BattlePresenter(
         battle.addBattleEventListener(::onBattleEvent)
     }
 
+    var pendingAction: BattleAction? = null
+
     fun onBattleEvent(event: BattleEvent) {
         Gdx.app.log(BattlePresenter::class.simpleName, event.toString())
         when (event) {
             is BattleEvent.PhaseChange -> {
                 if (event.phase == Battle.Phase.PLAYER_TURN) {
-                    showActionMenu()
+                    battleScreenView.enqueueAction(Actions.run { showActionMenu() })
                 } else {
-                    hideActionMenu()
+                    battleScreenView.enqueueAction(Actions.run { hideMenu() })
                 }
                 if (event.phase == Battle.Phase.ENEMY_TURN) {
                     battleScreenView.enqueueAction(delay(1f))
@@ -50,16 +53,78 @@ class BattlePresenter(
     }
 
     fun showActionMenu() {
-        battleScreenView.enqueueAction(Actions.run {
-            battleScreenView.setMenu(listOf(
-                BattleMenuItem(Attack.NAME, Attack.ATTACK_ID)
-            )) {
-                battle.takePlayerAction(Attack(), listOf(battle.enemyBattlerOne))
+        battleScreenView.setMenu(
+            listOf(
+                BattleMenuItem(Attack.NAME, Attack.ATTACK_ID),
+                BattleMenuItem("Skills", "skill")
+            )
+        ) {
+            when (it) {
+                Attack.ATTACK_ID -> {
+                    pendingAction = Attack.instance
+                    showTargetingMenu()
+                }
+                "skill" -> showSkillMenu()
             }
-        })
+        }
     }
 
-    fun hideActionMenu() {
+    fun showTargetingMenu() {
+        val pendingAction = pendingAction ?: return
+        val playerBattler = battle.getCurrentPlayerBattler()
+        val targets = battle.battlers.filter {
+            pendingAction.isValid(playerBattler, it)
+        }
+
+        targets.map { target ->
+            BattleMenuItem(text = target.name, id = target.id)
+        }.let { menuItems ->
+            menuItems + BattleMenuItem("Back", "back")
+        }.let { menuItems ->
+            battleScreenView.setMenu(menuItems) { id ->
+                if (id == "back") {
+                    if (pendingAction.id == Attack.ATTACK_ID) {
+                        showActionMenu()
+                    } else {
+                        showSkillMenu()
+                    }
+                } else {
+                    targets.first { it.id == id }
+                        .let { target ->
+                            hideMenu()
+                            battle.takePlayerAction(
+                                action = pendingAction,
+                                targets = listOf(target)
+                            )
+                        }
+                }
+            }
+        }
+
+    }
+
+    fun showSkillMenu() {
+        val playerBattler = battle.getCurrentPlayerBattler()
+        val menuItems = playerBattler.skills.map {
+            BattleMenuItem(text = it.name, id = it.id)
+        } + BattleMenuItem("Back", "back")
+        battleScreenView.setMenu(menuItems) { id ->
+            if (id == "back") {
+                showActionMenu()
+            } else {
+                playerBattler.skills
+                    .first { it.id == id }
+                    .let {
+                        pendingAction = it
+                        showTargetingMenu()
+                    }
+            }
+        }
+    }
+
+
+
+    fun hideMenu() {
         battleScreenView.menuItems = emptyList()
     }
 

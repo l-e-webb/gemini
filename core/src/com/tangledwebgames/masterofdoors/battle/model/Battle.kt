@@ -46,6 +46,12 @@ data class Battle(
     val battleEvents: List<BattleEvent> = _battleEvents
     private val battleEventListeners: MutableSet<(BattleEvent) -> Unit> = mutableSetOf()
 
+    fun getCurrentPlayerBattler() = when (playerTurnIndex) {
+        0 -> playerBattlerOne
+        1 -> playerBattlerTwo
+        else -> playerBattlerOne
+    }
+
     fun reset() {
         round = 0
         playerTurnIndex = 0

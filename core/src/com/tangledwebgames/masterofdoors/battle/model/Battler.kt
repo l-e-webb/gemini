@@ -51,6 +51,6 @@ data class Battler(
 
     fun isAlive(): Boolean = health > 0
 
-    fun isAlly(other: Battler) = isEnemy != other.isEnemy
+    fun isAlly(other: Battler) = isEnemy == other.isEnemy
 
 }
