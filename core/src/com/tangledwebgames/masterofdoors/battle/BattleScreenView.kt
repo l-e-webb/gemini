@@ -1,15 +1,14 @@
 package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Container
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.utils.Align
-import com.tangledwebgames.masterofdoors.HEALTH_BAR_STYLE
-import com.tangledwebgames.masterofdoors.MANA_BAR_STYLE
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_IN_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_INITIAL_ALPHA
@@ -21,8 +20,11 @@ import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_WAIT_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_ONE_ID
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_TWO_ID
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_ONE_ID
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_TWO_ID
 import com.tangledwebgames.masterofdoors.skin
-import com.tangledwebgames.masterofdoors.util.textProperty
 import ktx.actors.alpha
 import ktx.actors.onClick
 import ktx.actors.then
@@ -31,57 +33,24 @@ import ktx.style.get
 import kotlin.math.pow
 import kotlin.properties.Delegates
 
-class BattleScreenView(private val stage: Stage) {
+class BattleScreenView(val stage: Stage) {
 
-    private val characterOneNameLabel: Label
-    private val characterOneHealthBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
-        progressBarStyle = HEALTH_BAR_STYLE,
-        labelGenerator = { current, max ->
-            "Health: $current / $max"
-        }
-    )
-    private val characterOneManaBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
-        progressBarStyle = MANA_BAR_STYLE,
-        labelGenerator = { current, max ->
-            "Mana: $current / $max"
-        }
-    )
-    private val characterTwoNameLabel: Label
-    private val characterTwoHealthBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
-        progressBarStyle = HEALTH_BAR_STYLE,
-        labelGenerator = { current, max ->
-            "Health: $current / $max"
-        }
-    )
-    private val characterTwoManaBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
-        progressBarStyle = MANA_BAR_STYLE,
-        labelGenerator = { current, max ->
-            "Mana: $current / $max"
-        }
+    val sequenceAction = SequenceAction()
+
+    val playerOneViewHolder = BattlerViewHolder()
+    val playerTwoViewHolder = BattlerViewHolder()
+    val enemyOneViewHolder = BattlerViewHolder(manaBar = null)
+    val enemyTwoViewHolder = BattlerViewHolder(manaBar = null)
+
+    private val battlerViewHolder = mutableMapOf<String, BattlerViewHolder>(
+        PLAYER_ONE_ID to playerOneViewHolder,
+        PLAYER_TWO_ID to playerTwoViewHolder,
+        ENEMY_ONE_ID to enemyOneViewHolder,
+        ENEMY_TWO_ID to enemyTwoViewHolder
     )
 
     private val enemyHorizontalGroup: KHorizontalGroup
-    private val enemyOneNameLabel: Label
-    private val enemyOneHealthBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
-        progressBarStyle = HEALTH_BAR_STYLE,
-        labelGenerator = { current, max ->
-            "Health: $current / $max"
-        }
-    )
     private val enemyTwoTable: KTableWidget
-    private val enemyTwoNameLabel: Label
-    private val enemyTwoHealthBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
-        progressBarStyle = HEALTH_BAR_STYLE,
-        labelGenerator = { current, max ->
-            "Health: $current / $max"
-        }
-    )
 
     private val logScrollPane: ScrollPane
     private val logVerticalGroup: KVerticalGroup
@@ -118,26 +87,24 @@ class BattleScreenView(private val stage: Stage) {
                     table {
                         defaults().space(PADDING_MEDIUM)
 
-                        label("") {
+                        actor(enemyOneViewHolder.nameLabel) {
                             it.left()
-                            enemyOneNameLabel = this
                         }
 
                         row()
-                        actor(enemyOneHealthBar.rootTable)
+                        actor(enemyOneViewHolder.healthBar.rootTable)
                     }
 
                     table {
                         enemyTwoTable = this
                         defaults().space(PADDING_MEDIUM)
 
-                        label("") {
+                        actor(enemyTwoViewHolder.nameLabel) {
                             it.left()
-                            enemyTwoNameLabel = this
                         }
 
                         row()
-                        actor(enemyTwoHealthBar.rootTable)
+                        actor(enemyTwoViewHolder.healthBar.rootTable)
                     }
                 }
 
@@ -148,16 +115,15 @@ class BattleScreenView(private val stage: Stage) {
                     pad(PADDING_MEDIUM)
                     defaults().space(PADDING_MEDIUM)
 
-                    label("") {
+                    actor(playerOneViewHolder.nameLabel) {
                         it.left()
-                        characterOneNameLabel = this
                     }
 
                     row()
-                    actor(characterOneHealthBar.rootTable)
+                    actor(playerOneViewHolder.healthBar.rootTable)
 
                     row()
-                    actor(characterOneManaBar.rootTable)
+                    actor(requireNotNull(playerOneViewHolder.manaBar).rootTable)
                 }
 
                 table { cell ->
@@ -166,16 +132,15 @@ class BattleScreenView(private val stage: Stage) {
                     pad(PADDING_MEDIUM)
                     defaults().space(PADDING_MEDIUM)
 
-                    label("") {
+                    actor(playerTwoViewHolder.nameLabel) {
                         it.left()
-                        characterTwoNameLabel = this
                     }
 
                     row()
-                    actor(characterTwoHealthBar.rootTable)
+                    actor(playerTwoViewHolder.healthBar.rootTable)
 
                     row()
-                    actor(characterTwoManaBar.rootTable)
+                    actor(requireNotNull(playerTwoViewHolder.manaBar).rootTable)
                 }
             }
 
@@ -195,25 +160,6 @@ class BattleScreenView(private val stage: Stage) {
             }
         }
     }
-
-    var characterOneName: String by characterOneNameLabel.textProperty()
-    var characterOneCurrentHealth: Int by characterOneHealthBar::currentValue
-    var characterOneMaxHealth: Int by characterOneHealthBar::maxValue
-    var characterOneCurrentMana: Int by characterOneManaBar::currentValue
-    var characterOneMaxMana: Int by characterOneManaBar::maxValue
-
-    var characterTwoName: String by characterTwoNameLabel.textProperty()
-    var characterTwoCurrentHealth: Int by characterTwoHealthBar::currentValue
-    var characterTwoMaxHealth: Int by characterTwoHealthBar::maxValue
-    var characterTwoCurrentMana: Int by characterTwoManaBar::currentValue
-    var characterTwoMaxMana: Int by characterTwoManaBar::maxValue
-
-    var enemyOneName: String by enemyOneNameLabel.textProperty()
-    var enemyOneCurrentHealth: Int by enemyOneHealthBar::currentValue
-    var enemyOneMaxHealth: Int by enemyOneHealthBar::maxValue
-    var enemyTwoName: String by enemyTwoNameLabel.textProperty()
-    var enemyTwoCurrentHealth: Int by enemyTwoHealthBar::currentValue
-    var enemyTwoMaxHealth: Int by enemyTwoHealthBar::maxValue
 
     var showEnemyTwo: Boolean by Delegates.observable(true) { _, old, new ->
         if (old != new) {
@@ -287,16 +233,17 @@ class BattleScreenView(private val stage: Stage) {
         logScrollPane.addAction(action)
     }
 
+    fun getViewHolder(battlerId: String): BattlerViewHolder {
+        return requireNotNull(battlerViewHolder[battlerId])
+    }
+
     fun showPopupText(target: String, text: String, labelStyle: String) {
-        val (x, y) = when (target) {
-            "c1" -> characterOneHealthBar.rootTable
-            "c2" -> characterTwoHealthBar.rootTable
-            "e1" -> enemyOneHealthBar.rootTable
-            "e2" -> enemyTwoHealthBar.rootTable
-            else -> return
-        }.let {
-            it.localToStageCoordinates(Vector2(it.width / 2, it.height / 2))
-        }.let { it.x to it.y }
+        val (x, y) = getViewHolder(target)
+            .healthBar
+            .rootTable
+            .let {
+                it.localToStageCoordinates(Vector2(it.width / 2, it.height / 2))
+            }.let { it.x to it.y }
 
         scene2d.label(text, labelStyle) {
             width = prefWidth
@@ -314,5 +261,12 @@ class BattleScreenView(private val stage: Stage) {
                     Actions.removeActor()
             addAction(action)
         }.also { stage.addActor(it) }
+    }
+
+    fun enqueueAction(action: Action) {
+        sequenceAction.addAction(action)
+        if (sequenceAction.actor == null) {
+            stage.addAction(sequenceAction)
+        }
     }
 }

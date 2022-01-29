@@ -2,46 +2,31 @@ package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.tangledwebgames.masterofdoors.DAMAGE_POPUP_STYLE
+import com.tangledwebgames.masterofdoors.battle.model.Battle
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_ONE_ID
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_TWO_ID
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_ONE_ID
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_TWO_ID
+import com.tangledwebgames.masterofdoors.battle.model.Battler
 import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
 
     private lateinit var view: BattleScreenView
+    private lateinit var presenter: BattlePresenter
+    private lateinit var battle: Battle
 
     override fun show() {
         stage.clear()
-        view = BattleScreenView(stage).apply {
-            characterOneName = "Alpha 5"
-            characterOneMaxHealth = 75
-            characterOneCurrentHealth = 75
-            characterOneMaxMana = 20
-            characterOneCurrentMana = 0
-            characterTwoName = "Omega"
-            characterTwoMaxHealth = 50
-            characterTwoCurrentHealth = 25
-            characterTwoMaxMana = 25
-            characterTwoCurrentMana = 20
-            enemyOneName = "Janus - Left"
-            enemyOneMaxHealth = 1000
-            enemyOneCurrentHealth = 500
-            enemyTwoName = "Janus - Right"
-            enemyTwoMaxHealth = 1000
-            enemyTwoCurrentHealth = 1000
-
-            var i = 0
-            setMenu(listOf(
-                BattleMenuItem("Attack", "attack"),
-                BattleMenuItem("Skill", "skill"),
-                BattleMenuItem("Spell", "spell")
-            )) {
-                characterOneCurrentHealth -= 5
-                showEnemyTwo = !showEnemyTwo
-                pushLogItem("Log item $i")
-                showPopupText("c1", "5", DAMAGE_POPUP_STYLE)
-                i++
-            }
-        }
+        view = BattleScreenView(stage)
+        battle = Battle(
+            Battler(PLAYER_ONE_ID, "Player One"),
+            Battler(PLAYER_TWO_ID, "Player Two"),
+            Battler(ENEMY_ONE_ID, "Enemy One"),
+            Battler(ENEMY_TWO_ID, "Enemy Two")
+        )
+        presenter = BattlePresenter(view, battle)
+        battle.begin()
     }
 
     override fun render(delta: Float) {
