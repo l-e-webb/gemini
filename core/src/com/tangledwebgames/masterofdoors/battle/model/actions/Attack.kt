@@ -7,7 +7,7 @@ import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.viewStateChange
 import com.tangledwebgames.masterofdoors.util.listBuilder
 
-class Attack: BattleAction {
+class Attack : BattleAction {
 
     companion object {
         const val ATTACK_ID = "attack"
@@ -31,7 +31,11 @@ class Attack: BattleAction {
             modifier = -3,
             difficulty = target.defense
         )
-        val multiplier = if (isCrit) { 3 } else { 2 }
+        val multiplier = if (isCrit) {
+            3
+        } else {
+            2
+        }
         val damage = (actor.attack * multiplier - target.defense).coerceAtLeast(0)
         target.health = (target.health - damage).coerceAtLeast(0)
         return listBuilder {

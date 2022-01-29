@@ -3,12 +3,7 @@ package com.tangledwebgames.masterofdoors.battle
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.tangledwebgames.masterofdoors.battle.model.Battle
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_ONE_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_TWO_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_ONE_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_TWO_ID
 import com.tangledwebgames.masterofdoors.battle.model.Battler
-import com.tangledwebgames.masterofdoors.battle.model.actions.NonAction
 import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
@@ -20,15 +15,33 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
     override fun show() {
         stage.clear()
         view = BattleScreenView(stage)
-        battle = Battle(
-            Battler(PLAYER_ONE_ID, "Player One", isEnemy = false),
-            Battler(PLAYER_TWO_ID, "Player Two", isEnemy = false),
-            Battler(ENEMY_ONE_ID, "Enemy One", isEnemy = true),
-            Battler(ENEMY_TWO_ID, "Enemy Two", isEnemy = true)
-        )
-        battle.playerBattlerOne.skills.add(NonAction())
-        battle.playerBattlerTwo.skills.add(NonAction())
+        battle = Battle()
         presenter = BattlePresenter(view, battle)
+        battle.playerBattlers.apply {
+            add(
+                Battler(
+                    id = "p1",
+                    name = "Player 1",
+                    isEnemy = false
+                )
+            )
+            add(
+                Battler(
+                    id = "p2",
+                    name = "Player 2",
+                    isEnemy = false
+                )
+            )
+        }
+        battle.enemyBattlers.apply {
+            add(
+                Battler(
+                    id = "e1",
+                    name = "Enemy 1",
+                    isEnemy = true
+                )
+            )
+        }
         battle.begin()
     }
 

@@ -55,7 +55,7 @@ private fun initSkin(skin: Skin) = with(skin) {
     Assets.arialBoldFontGenerator.asset.generateFont {
         size = BATTLE_POPUP_FONT_SIZE
         color = Color.WHITE
-    }.also { add(it, POPUP_FONT)}
+    }.also { add(it, POPUP_FONT) }
 
     label(GENERIC_POPUP_STYLE) {
         font = skin[POPUP_FONT]

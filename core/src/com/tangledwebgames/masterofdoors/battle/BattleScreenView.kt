@@ -1,5 +1,6 @@
 package com.tangledwebgames.masterofdoors.battle
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -20,10 +21,6 @@ import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_WAIT_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_ONE_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_TWO_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_ONE_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_TWO_ID
 import com.tangledwebgames.masterofdoors.skin
 import ktx.actors.alpha
 import ktx.actors.onClick
@@ -37,20 +34,11 @@ class BattleScreenView(val stage: Stage) {
 
     val sequenceAction = SequenceAction()
 
-    val playerOneViewHolder = BattlerViewHolder()
-    val playerTwoViewHolder = BattlerViewHolder()
-    val enemyOneViewHolder = BattlerViewHolder(manaBar = null)
-    val enemyTwoViewHolder = BattlerViewHolder(manaBar = null)
-
-    private val battlerViewHolder = mutableMapOf<String, BattlerViewHolder>(
-        PLAYER_ONE_ID to playerOneViewHolder,
-        PLAYER_TWO_ID to playerTwoViewHolder,
-        ENEMY_ONE_ID to enemyOneViewHolder,
-        ENEMY_TWO_ID to enemyTwoViewHolder
-    )
+    val playerBattlerViewHolders = mutableListOf<BattlerViewHolder>()
+    val enemyBattlerViewHolders = mutableListOf<BattlerViewHolder>()
 
     private val enemyHorizontalGroup: KHorizontalGroup
-    private val enemyTwoTable: KTableWidget
+    private val playerHorizontalGroup: KHorizontalGroup
 
     private val logScrollPane: ScrollPane
     private val logVerticalGroup: KVerticalGroup
@@ -79,68 +67,15 @@ class BattleScreenView(val stage: Stage) {
 
 
                 row().expand()
-                horizontalGroup { cell ->
-                    cell.colspan(2)
+                horizontalGroup {
                     enemyHorizontalGroup = this
                     space(PADDING_LARGE)
-
-                    table {
-                        defaults().space(PADDING_MEDIUM)
-
-                        actor(enemyOneViewHolder.nameLabel) {
-                            it.left()
-                        }
-
-                        row()
-                        actor(enemyOneViewHolder.healthBar.rootTable)
-                    }
-
-                    table {
-                        enemyTwoTable = this
-                        defaults().space(PADDING_MEDIUM)
-
-                        actor(enemyTwoViewHolder.nameLabel) {
-                            it.left()
-                        }
-
-                        row()
-                        actor(enemyTwoViewHolder.healthBar.rootTable)
-                    }
                 }
 
                 row()
-                table { cell ->
-                    cell.right()
-                    background = skin["panel"]
-                    pad(PADDING_MEDIUM)
-                    defaults().space(PADDING_MEDIUM)
-
-                    actor(playerOneViewHolder.nameLabel) {
-                        it.left()
-                    }
-
-                    row()
-                    actor(playerOneViewHolder.healthBar.rootTable)
-
-                    row()
-                    actor(requireNotNull(playerOneViewHolder.manaBar).rootTable)
-                }
-
-                table { cell ->
-                    cell.left()
-                    background = skin["panel"]
-                    pad(PADDING_MEDIUM)
-                    defaults().space(PADDING_MEDIUM)
-
-                    actor(playerTwoViewHolder.nameLabel) {
-                        it.left()
-                    }
-
-                    row()
-                    actor(playerTwoViewHolder.healthBar.rootTable)
-
-                    row()
-                    actor(requireNotNull(playerTwoViewHolder.manaBar).rootTable)
+                horizontalGroup {
+                    playerHorizontalGroup = this
+                    space(PADDING_LARGE)
                 }
             }
 
@@ -161,21 +96,41 @@ class BattleScreenView(val stage: Stage) {
         }
     }
 
-    var showEnemyTwo: Boolean by Delegates.observable(true) { _, old, new ->
-        if (old != new) {
-            if (new) {
-                enemyHorizontalGroup.addActor(enemyTwoTable)
-            } else {
-                enemyHorizontalGroup.removeActor(enemyTwoTable)
+    fun battlerView(
+        battlerId: String,
+        includeBackground: Boolean,
+        includeManaBar: Boolean
+    ): BattlerViewHolder {
+        val viewHolder = if (includeManaBar) {
+            BattlerViewHolder(battlerId = battlerId)
+        } else {
+            BattlerViewHolder(battlerId = battlerId, manaBar = null)
+        }
+        viewHolder.rootTable.apply {
+            if (includeBackground) {
+                background = skin["panel"]
+                pad(PADDING_MEDIUM)
+            }
+            defaults().space(PADDING_MEDIUM)
+
+            actor(viewHolder.nameLabel) { it.left() }
+
+            row()
+            actor(viewHolder.healthBar.rootTable)
+
+            viewHolder.manaBar?.let {
+                row()
+                actor(it.rootTable)
             }
         }
+        return viewHolder
     }
 
     var onMenuItemClick: (String) -> Unit = {}
 
     var menuItems: List<BattleMenuItem> by Delegates.observable(emptyList()) { _, old, new ->
         if (old != new) {
-            with (menuContainer.actor) {
+            with(menuContainer.actor) {
                 clearChildren()
                 for (item in new) {
                     textButton(item.text) {
@@ -203,6 +158,73 @@ class BattleScreenView(val stage: Stage) {
         checkRemoveLogItems()
     }
 
+    fun addBattlerView(battlerId: String, isPlayer: Boolean): BattlerViewHolder? {
+        val viewHolderList = if (isPlayer) {
+            playerBattlerViewHolders
+        } else {
+            enemyBattlerViewHolders
+        }
+        val horizontalGroup = if (isPlayer) {
+            playerHorizontalGroup
+        } else {
+            enemyHorizontalGroup
+        }
+
+        if (viewHolderList.any { it.battlerId == battlerId }) {
+            Gdx.app.log(
+                BattleScreenView::class.simpleName,
+                "Attempting to add battler view for $battlerId when view for that battler ID is already present."
+            )
+            return null
+        }
+
+        return battlerView(
+            battlerId = battlerId,
+            includeBackground = isPlayer,
+            includeManaBar = isPlayer
+        ).also {
+            viewHolderList.add(it)
+            horizontalGroup.addActor(it.rootTable)
+        }
+    }
+
+    fun addPlayerBattlerView(battlerId: String) = addBattlerView(battlerId = battlerId, isPlayer = true)
+
+    fun addEnemyBattlerView(battlerId: String) = addBattlerView(battlerId = battlerId, isPlayer = false)
+
+    fun removeBattlerView(battlerId: String) {
+        getViewHolder(battlerId)?.let {
+            playerBattlerViewHolders.remove(it)
+            enemyBattlerViewHolders.remove(it)
+            playerHorizontalGroup.removeActor(it.rootTable)
+            enemyHorizontalGroup.removeActor(it.rootTable)
+        }
+    }
+
+    fun clearAllBattlerViews() {
+        enemyBattlerViewHolders.clear()
+        playerBattlerViewHolders.clear()
+        enemyHorizontalGroup.clearChildren()
+        playerHorizontalGroup.clearChildren()
+    }
+
+    fun getViewHolder(battlerId: String): BattlerViewHolder? {
+        return enemyBattlerViewHolders.firstOrNull { it.battlerId == battlerId }
+            ?: playerBattlerViewHolders.firstOrNull { it.battlerId == battlerId }
+    }
+
+    fun pushLogItem(text: String) {
+        logVerticalGroup.label(text).apply {
+            wrap = true
+            setAlignment(Align.center)
+        }
+        checkRemoveLogItems()
+        val action = Actions.delay(0.02f) then Actions.run {
+            logScrollPane.scrollPercentY = 1f
+        }
+        logScrollPane.addAction(action)
+    }
+
     private fun checkRemoveLogItems() {
         while (numLogItems < logVerticalGroup.children.size) {
             logVerticalGroup.removeActorAt(0, true).also {
@@ -221,29 +243,12 @@ class BattleScreenView(val stage: Stage) {
         }
     }
 
-    fun pushLogItem(text: String) {
-        logVerticalGroup.label(text).apply {
-            wrap = true
-            setAlignment(Align.center)
-        }
-        checkRemoveLogItems()
-        val action = Actions.delay(0.02f) then Actions.run {
-            logScrollPane.scrollPercentY = 1f
-        }
-        logScrollPane.addAction(action)
-    }
-
-    fun getViewHolder(battlerId: String): BattlerViewHolder {
-        return requireNotNull(battlerViewHolder[battlerId])
-    }
-
     fun showPopupText(target: String, text: String, labelStyle: String) {
         val (x, y) = getViewHolder(target)
-            .healthBar
-            .rootTable
-            .let {
+            ?.rootTable
+            ?.let {
                 it.localToStageCoordinates(Vector2(it.width / 2, it.height / 2))
-            }.let { it.x to it.y }
+            }?.let { it.x to it.y } ?: return
 
         scene2d.label(text, labelStyle) {
             width = prefWidth

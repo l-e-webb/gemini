@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleAction
 import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
+import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.actions.Attack
 import ktx.actors.then
 
@@ -34,22 +35,31 @@ class BattlePresenter(
                     battleScreenView.enqueueAction(delay(1f))
                 }
                 if (event.phase == Battle.Phase.BATTLE_START) {
+                    battleScreenView.clearAllBattlerViews()
                     battle.battlers.forEach {
-                        battleScreenView.getViewHolder(it.id).apply {
-                            name = it.name
-                            maxHealth = it.maxHealth
-                            health = it.health
-                            maxMana = it.maxMana
-                            mana = it .mana
-                            // TODO: status effect
-                        }
+                        addBattlerView(it)
                     }
                 }
             }
             is BattleEvent.ViewStateChange -> {
                 applyViewStateChange(event)
             }
+            is BattleEvent.AddBattler -> {
+                battle.getBattler(event.battlerId)?.let {
+                    addBattlerView(it)
+                }
+            }
+            is BattleEvent.RemoveBattler -> {
+                battleScreenView.removeBattlerView(event.battlerId)
+            }
         }
+    }
+
+    fun addBattlerView(battler: Battler) {
+        battleScreenView.addBattlerView(
+            battlerId = battler.id,
+            isPlayer = !battler.isEnemy
+        )?.setFrom(battler)
     }
 
     fun showActionMenu() {
@@ -71,7 +81,7 @@ class BattlePresenter(
 
     fun showTargetingMenu() {
         val pendingAction = pendingAction ?: return
-        val playerBattler = battle.getCurrentPlayerBattler()
+        val playerBattler = battle.getCurrentPlayerBattler() ?: return
         val targets = battle.battlers.filter {
             pendingAction.isValid(playerBattler, it)
         }
@@ -104,7 +114,7 @@ class BattlePresenter(
     }
 
     fun showSkillMenu() {
-        val playerBattler = battle.getCurrentPlayerBattler()
+        val playerBattler = battle.getCurrentPlayerBattler() ?: return
         val menuItems = playerBattler.skills.map {
             BattleMenuItem(text = it.name, id = it.id)
         } + BattleMenuItem("Back", "back")
@@ -122,14 +132,12 @@ class BattlePresenter(
         }
     }
 
-
-
     fun hideMenu() {
         battleScreenView.menuItems = emptyList()
     }
 
     fun applyViewStateChange(event: BattleEvent.ViewStateChange) {
-        var action: Action  = Actions.run {
+        var action: Action = Actions.run {
             event.logMessage?.let {
                 battleScreenView.pushLogItem(it)
             }
@@ -139,7 +147,7 @@ class BattlePresenter(
                 )
             }
             event.statusChanges?.forEach { change ->
-                with (battleScreenView.getViewHolder(change.battlerId)) {
+                battleScreenView.getViewHolder(change.battlerId)?.apply {
                     change.name?.let {
                         name = it
                     }

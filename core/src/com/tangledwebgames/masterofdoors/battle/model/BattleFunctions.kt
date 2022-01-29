@@ -8,6 +8,6 @@ object BattleFunctions {
         modifier: Int,
         difficulty: Int
     ): Boolean {
-        return stat + modifier +  Random.nextInt(-5, 5) > difficulty
+        return stat + modifier + Random.nextInt(-5, 5) > difficulty
     }
 }

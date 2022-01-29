@@ -16,6 +16,10 @@ sealed class BattleEvent {
     data class PhaseChange(val phase: Battle.Phase) : BattleEvent()
 
     data class BattleOver(val playerWins: Boolean) : BattleEvent()
+
+    data class AddBattler(val battlerId: String) : BattleEvent()
+
+    data class RemoveBattler(val battlerId: String) : BattleEvent()
 }
 
 data class TextPopup(

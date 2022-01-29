@@ -1,16 +1,10 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
 import com.badlogic.gdx.Gdx
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_ONE_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ENEMY_TWO_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_ONE_ID
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.PLAYER_TWO_ID
 
 data class Battle(
-    val playerBattlerOne: Battler,
-    val playerBattlerTwo: Battler,
-    val enemyBattlerOne: Battler,
-    val enemyBattlerTwo: Battler,
+    val playerBattlers: MutableList<Battler> = mutableListOf(),
+    val enemyBattlers: MutableList<Battler> = mutableListOf(),
     var round: Int = 0,
     var playerTurnIndex: Int = 0,
     var enemyTurnIndex: Int = 0,
@@ -26,31 +20,19 @@ data class Battle(
         BATTLE_END
     }
 
-    init {
-        playerBattlerOne.id = PLAYER_ONE_ID
-        playerBattlerTwo.id = PLAYER_TWO_ID
-        enemyBattlerOne.id = ENEMY_ONE_ID
-        enemyBattlerTwo.id = ENEMY_TWO_ID
-    }
-
-    val battlers = listOf(
-        playerBattlerOne,
-        playerBattlerTwo,
-        enemyBattlerOne,
-        enemyBattlerTwo
-    )
-
-    val battlerMap = battlers.associateBy { it.id }
+    val battlers: List<Battler>
+        get() = playerBattlers + enemyBattlers
 
     private val _battleEvents = mutableListOf<BattleEvent>()
     val battleEvents: List<BattleEvent> = _battleEvents
     private val battleEventListeners: MutableSet<(BattleEvent) -> Unit> = mutableSetOf()
 
-    fun getCurrentPlayerBattler() = when (playerTurnIndex) {
-        0 -> playerBattlerOne
-        1 -> playerBattlerTwo
-        else -> playerBattlerOne
-    }
+    fun getBattler(battlerId: String): Battler? = playerBattlers.firstOrNull { it.id == battlerId }
+        ?: enemyBattlers.firstOrNull { it.id == battlerId }
+
+    fun getCurrentPlayerBattler() = playerBattlers.getOrNull(playerTurnIndex)
+
+    fun getCurrentEnemyBattler() = enemyBattlers.getOrNull(enemyTurnIndex)
 
     fun reset() {
         round = 0
@@ -84,11 +66,7 @@ data class Battle(
                 advance()
             }
             Phase.PLAYER_TURN_START -> {
-                when (playerTurnIndex) {
-                    0 -> playerBattlerOne
-                    1 -> playerBattlerTwo
-                    else -> null
-                }?.let {
+                getCurrentPlayerBattler()?.let {
                     if (it.canAct()) {
                         updatePhase(Phase.PLAYER_TURN)
                         // Do not advance, wait for action.
@@ -105,11 +83,13 @@ data class Battle(
                 /* Do nothing, wait for player to select action */
             }
             Phase.ENEMY_TURN -> {
-                if (enemyTurnIndex < 2) {
-                    takeEnemyTurn()
+                getCurrentEnemyBattler()?.let {
+                    takeEnemyTurn(it)
                 }
 
-                if (checkEndBattle()) { return }
+                if (checkEndBattle()) {
+                    return
+                }
 
                 if (phase == Phase.ENEMY_TURN && enemyTurnIndex == 0) {
                     enemyTurnIndex++
@@ -134,19 +114,33 @@ data class Battle(
         action: BattleAction,
         targets: List<Battler>
     ) {
-        when (playerTurnIndex) {
-            0 -> playerBattlerOne
-            1 -> playerBattlerTwo
-            else -> null
-        }?.let {
+        getCurrentPlayerBattler()?.let {
             takeAction(action, it, targets)
         }
 
-        if (checkEndBattle()) { return }
+        if (checkEndBattle()) {
+            return
+        }
 
         playerTurnIndex++
         updatePhase(Phase.PLAYER_TURN_START)
         advance()
+    }
+
+    fun takeEnemyTurn(enemy: Battler) {
+        if (!enemy.canAct()) {
+            return
+        }
+        determineEnemyAction(
+            battle = this,
+            enemy = enemy
+        ).let { (action, targets) ->
+            takeAction(
+                action = action,
+                actor = enemy,
+                targets = targets
+            )
+        }
     }
 
     fun takeAction(
@@ -154,6 +148,7 @@ data class Battle(
         actor: Battler,
         targets: List<Battler>
     ) {
+        val battlers = battlers
         if (actor !in battlers || !battlers.containsAll(targets)) {
             Gdx.app.log(Battle::class.simpleName, "Attempting to invoke action with actor or battlers not in battle.")
             return
@@ -169,32 +164,11 @@ data class Battle(
             ?: Gdx.app.log(Battle::class.simpleName, "Action invoked with no valid targets.")
     }
 
-    fun takeEnemyTurn() {
-        val enemy = when (enemyTurnIndex) {
-            0 -> enemyBattlerOne
-            1 -> enemyBattlerTwo
-            else -> return
-        }
-        if (!enemy.canAct()) {
-            return
-        }
-        determineEnemyAction(
-            battle = this,
-            enemyIndex = enemyTurnIndex
-        ).let { (action, targets) ->
-            takeAction(
-                action = action,
-                actor = enemy,
-                targets = targets
-            )
-        }
-    }
-
     fun checkEndBattle(): Boolean {
-        return if (!playerBattlerOne.isAlive() && !playerBattlerTwo.isAlive()) {
+        return if (playerBattlers.none { it.isAlive() }) {
             pushBattleEvent(BattleEvent.BattleOver(playerWins = false))
             true
-        } else if (!enemyBattlerOne.isAlive() && !enemyBattlerOne.isAlive()) {
+        } else if (enemyBattlers.none { it.isAlive() }) {
             pushBattleEvent(BattleEvent.BattleOver(playerWins = true))
             true
         } else {
