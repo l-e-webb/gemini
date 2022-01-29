@@ -13,7 +13,7 @@ data class Battler(
     var caution: Int = 5,
     var isEnemy: Boolean = false,
     val statusEffects: MutableList<StatusEffect> = mutableListOf(),
-    val skills: MutableList<Action> = mutableListOf()
+    val skills: MutableList<BattleAction> = mutableListOf()
 ) {
     val maxHealth: Int
         get() = 50 + (physique + power + caution) * 5
@@ -46,7 +46,11 @@ data class Battler(
     }
 
     fun canAct(): Boolean {
-        return health > 0
+        return isAlive()
     }
+
+    fun isAlive(): Boolean = health > 0
+
+    fun isAlly(other: Battler) = isEnemy != other.isEnemy
 
 }

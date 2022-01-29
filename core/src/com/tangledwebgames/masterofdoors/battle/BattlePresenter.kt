@@ -3,9 +3,10 @@ package com.tangledwebgames.masterofdoors.battle
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Action
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
+import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
-import com.tangledwebgames.masterofdoors.battle.model.actions.NonAction
+import com.tangledwebgames.masterofdoors.battle.model.actions.Attack
 import ktx.actors.then
 
 class BattlePresenter(
@@ -25,6 +26,9 @@ class BattlePresenter(
                     showActionMenu()
                 } else {
                     hideActionMenu()
+                }
+                if (event.phase == Battle.Phase.ENEMY_TURN) {
+                    battleScreenView.enqueueAction(delay(1f))
                 }
                 if (event.phase == Battle.Phase.BATTLE_START) {
                     battle.battlers.forEach {
@@ -48,9 +52,9 @@ class BattlePresenter(
     fun showActionMenu() {
         battleScreenView.enqueueAction(Actions.run {
             battleScreenView.setMenu(listOf(
-                BattleMenuItem("Do nothing", "")
+                BattleMenuItem(Attack.NAME, Attack.ATTACK_ID)
             )) {
-                battle.takePlayerAction(NonAction(), listOf(battle.playerBattlerOne))
+                battle.takePlayerAction(Attack(), listOf(battle.enemyBattlerOne))
             }
         })
     }

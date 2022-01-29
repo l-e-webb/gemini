@@ -402,8 +402,8 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 	default: {
 		font: font
 		fontColor: color
-		downFontColor: white
-		overFontColor: white
+		downFontColor: black
+		overFontColor: black
 		up: button-c
 		down: button-pressed-c
 		over: button-over-c

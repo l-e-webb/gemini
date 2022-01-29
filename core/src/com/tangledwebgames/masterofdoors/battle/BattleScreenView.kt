@@ -264,6 +264,9 @@ class BattleScreenView(val stage: Stage) {
     }
 
     fun enqueueAction(action: Action) {
+        if (sequenceAction.actor == null) {
+            sequenceAction.reset()
+        }
         sequenceAction.addAction(action)
         if (sequenceAction.actor == null) {
             stage.addAction(sequenceAction)

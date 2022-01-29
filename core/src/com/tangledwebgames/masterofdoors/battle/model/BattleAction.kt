@@ -1,6 +1,6 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
-interface Action {
+interface BattleAction {
 
     enum class TargetType {
         SINGLE, SIDE, ALL

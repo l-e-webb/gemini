@@ -125,7 +125,7 @@ data class Battle(
     }
 
     fun takePlayerAction(
-        action: Action,
+        action: BattleAction,
         targets: List<Battler>
     ) {
         when (playerTurnIndex) {
@@ -144,14 +144,13 @@ data class Battle(
     }
 
     fun takeAction(
-        action: Action,
+        action: BattleAction,
         actor: Battler,
         targets: List<Battler>
     ) {
         if (actor !in battlers || !battlers.containsAll(targets)) {
             Gdx.app.log(Battle::class.simpleName, "Attempting to invoke action with actor or battlers not in battle.")
             return
-
         }
         if (!actor.canAct()) {
             Gdx.app.log(Battle::class.simpleName, "Attempting to act as ${actor.name}, but cannot act.")
@@ -160,15 +159,41 @@ data class Battle(
         targets.filter { action.isValid(actor, it) }
             .takeIf { it.isNotEmpty() }
             ?.let { action.execute(actor, targets) }
+            ?.forEach { pushBattleEvent(it) }
             ?: Gdx.app.log(Battle::class.simpleName, "Action invoked with no valid targets.")
     }
 
     fun takeEnemyTurn() {
-
+        val enemy = when (enemyTurnIndex) {
+            0 -> enemyBattlerOne
+            1 -> enemyBattlerTwo
+            else -> return
+        }
+        if (!enemy.canAct()) {
+            return
+        }
+        determineEnemyAction(
+            battle = this,
+            enemyIndex = enemyTurnIndex
+        ).let { (action, targets) ->
+            takeAction(
+                action = action,
+                actor = enemy,
+                targets = targets
+            )
+        }
     }
 
     fun checkEndBattle(): Boolean {
-        return false
+        return if (!playerBattlerOne.isAlive() && !playerBattlerTwo.isAlive()) {
+            pushBattleEvent(BattleEvent.BattleOver(playerWins = false))
+            true
+        } else if (!enemyBattlerOne.isAlive() && !enemyBattlerOne.isAlive()) {
+            pushBattleEvent(BattleEvent.BattleOver(playerWins = true))
+            true
+        } else {
+            false
+        }
     }
 
     fun addBattleEventListener(listener: (BattleEvent) -> Unit) {
