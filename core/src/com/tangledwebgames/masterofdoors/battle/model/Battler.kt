@@ -3,7 +3,9 @@ package com.tangledwebgames.masterofdoors.battle.model
 data class Battler(
     var id: String,
     var name: String,
+    var isEnemy: Boolean = false,
     var health: Int = 0,
+    var bonusHealth: Int = 0,
     var mana: Int = 0,
     var physique: Int = 5,
     var spirit: Int = 5,
@@ -11,12 +13,11 @@ data class Battler(
     var finesse: Int = 5,
     var aggression: Int = 5,
     var caution: Int = 5,
-    var isEnemy: Boolean = false,
     val statusEffects: MutableList<StatusEffect> = mutableListOf(),
     val skills: MutableList<BattleAction> = mutableListOf()
 ) {
     val maxHealth: Int
-        get() = 50 + (physique + power + caution) * 5
+        get() = bonusHealth + (physique + power + caution) * 5
 
     val attack: Int
         get() = physique + power + aggression

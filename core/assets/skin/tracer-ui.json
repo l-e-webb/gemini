@@ -170,8 +170,8 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 		color: color
 	}
 	window-bg: {
-		name: window
-		color: bg
+		name: button-pressed-c
+		color: white
 	}
 	menu-bg-c: {
 		name: menu-bg
@@ -439,7 +439,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Tree$TreeStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 	default: {
 		background: window-bg
-		titleFont: font
+		titleFont: title
 	}
 }
 }

@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Container
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.utils.Align
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_IN_TIME
@@ -275,6 +277,39 @@ class BattleScreenView(val stage: Stage) {
         sequenceAction.addAction(action)
         if (sequenceAction.actor == null) {
             stage.addAction(sequenceAction)
+        }
+    }
+
+    fun showDialog(
+        title: String? = null,
+        body: String? = null,
+        buttons: List<BattleMenuItem>,
+        onClick: (String) -> Unit
+    ) {
+        object : Dialog(title ?: "", skin) {
+            override fun result(`object`: Any?) {
+                onClick(`object`.toString())
+            }
+        }.apply {
+            pad(PADDING_LARGE)
+            padTop(titleLabel.prefHeight + PADDING_MEDIUM)
+            defaults().space(PADDING_LARGE)
+
+            titleLabel.setAlignment(Align.center)
+
+            body?.let {
+
+                contentTable.add(Label(it, skin)).apply {
+                    fill().minWidth(300f)
+                    actor.wrap = true
+                }
+            }
+            buttonTable.defaults().space(PADDING_MEDIUM)
+            buttons.forEach {
+                button(it.text, it.id)
+            }
+
+            show(this@BattleScreenView.stage)
         }
     }
 }

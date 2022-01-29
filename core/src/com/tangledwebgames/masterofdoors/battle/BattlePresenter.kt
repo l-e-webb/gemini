@@ -46,11 +46,20 @@ class BattlePresenter(
             }
             is BattleEvent.AddBattler -> {
                 battle.getBattler(event.battlerId)?.let {
-                    addBattlerView(it)
+                    battleScreenView.enqueueAction(Actions.run {
+                        addBattlerView(it)
+                    })
                 }
             }
             is BattleEvent.RemoveBattler -> {
-                battleScreenView.removeBattlerView(event.battlerId)
+                battleScreenView.enqueueAction(Actions.run {
+                    battleScreenView.removeBattlerView(event.battlerId)
+                })
+            }
+            is BattleEvent.BattleOver -> {
+                battleScreenView.enqueueAction(Actions.run {
+                    showEndDialog(playerWins = event.playerWins)
+                })
             }
         }
     }
@@ -171,6 +180,31 @@ class BattlePresenter(
             action = action then Actions.delay(it)
         }
         battleScreenView.enqueueAction(action)
+    }
+
+    fun showEndDialog(playerWins: Boolean) {
+        val title = if (playerWins) {
+            "Victory!"
+        } else {
+            "Game over..."
+        }
+        val buttons = listOf(
+            BattleMenuItem(
+                text = "Play again",
+                id = "play"
+            ),
+            BattleMenuItem(
+                text = "Quit",
+                id = "quit"
+            )
+        )
+
+        battleScreenView.showDialog(title = title, buttons = buttons) {
+            when (it) {
+                "play" -> battle.begin()
+                "quit" -> Gdx.app.exit()
+            }
+        }
     }
 
     fun clear() {

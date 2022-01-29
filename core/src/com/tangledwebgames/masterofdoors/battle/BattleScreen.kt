@@ -22,14 +22,16 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
                 Battler(
                     id = "p1",
                     name = "Player 1",
-                    isEnemy = false
+                    isEnemy = false,
+                    bonusHealth = 50
                 )
             )
             add(
                 Battler(
                     id = "p2",
                     name = "Player 2",
-                    isEnemy = false
+                    isEnemy = false,
+                    bonusHealth = 50
                 )
             )
         }
@@ -38,7 +40,8 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
                 Battler(
                     id = "e1",
                     name = "Enemy 1",
-                    isEnemy = true
+                    isEnemy = true,
+                    bonusHealth = -60
                 )
             )
         }
