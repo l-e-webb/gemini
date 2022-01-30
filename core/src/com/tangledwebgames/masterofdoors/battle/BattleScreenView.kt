@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.utils.Align
+import com.tangledwebgames.masterofdoors.LABEL_LARGE_STYLE
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_IN_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_INITIAL_ALPHA
@@ -23,7 +24,10 @@ import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_WAIT_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants
+import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.skin
+import com.tangledwebgames.masterofdoors.status.statusView
 import ktx.actors.alpha
 import ktx.actors.onClick
 import ktx.actors.then
@@ -81,12 +85,12 @@ class BattleScreenView(val stage: Stage) {
                 }
             }
 
-            table {
+            container {
                 setFillParent(true)
                 pad(PADDING_LARGE)
+                bottom().left()
                 container(KVerticalGroup()) {
-                    it.expand().bottom().left()
-                    background = this@table.skin["panel"]
+                    background = skin["panel"]
                     fillX().bottom().pad(PADDING_MEDIUM).prefWidth(300f)
                     actor.apply {
                         grow()
@@ -95,6 +99,19 @@ class BattleScreenView(val stage: Stage) {
                     menuContainer = this
                 }
             }
+
+            container {
+                pad(PADDING_LARGE)
+                setFillParent(true)
+                bottom().right()
+                button(style = "info-uncheckable") {
+                    onClick {
+                        onInfoButtonClick()
+                    }
+                }
+            }
+
+
         }
     }
 
@@ -129,6 +146,7 @@ class BattleScreenView(val stage: Stage) {
     }
 
     var onMenuItemClick: (String) -> Unit = {}
+    var onInfoButtonClick: () -> Unit = {}
 
     var menuItems: List<BattleMenuItem> by Delegates.observable(emptyList()) { _, old, new ->
         if (old != new) {
@@ -148,6 +166,7 @@ class BattleScreenView(val stage: Stage) {
             } else {
                 skin["panel"]
             }
+            menuContainer.pad(PADDING_MEDIUM)
         }
     }
 
@@ -216,7 +235,7 @@ class BattleScreenView(val stage: Stage) {
     }
 
     fun pushLogItem(text: String) {
-        logVerticalGroup.label(text).apply {
+        logVerticalGroup.label(text, LABEL_LARGE_STYLE).apply {
             wrap = true
             setAlignment(Align.center)
         }
@@ -308,6 +327,101 @@ class BattleScreenView(val stage: Stage) {
             buttons.forEach {
                 button(it.text, it.id)
             }
+
+            show(this@BattleScreenView.stage)
+        }
+    }
+
+    fun showStatusDialog(battlers: List<Battler>) {
+        scene2d.dialog("Status") {
+            titleLabel.setAlignment(Align.center)
+            pad(PADDING_LARGE)
+            padTop(titleLabel.prefHeight + PADDING_MEDIUM)
+            defaults().space(PADDING_LARGE)
+
+            battlers.forEach { battler ->
+                scene2d.table {
+                    statusView(battler)
+                }.let {
+                    contentTable.add(it).uniform()
+                }
+            }
+
+            contentTable.row()
+            scene2d.table {
+                background = skin["panel"]
+                pad(PADDING_LARGE)
+                defaults().space(PADDING_MEDIUM)
+                label("Key", "title")
+
+                row()
+                table {
+                    defaults()
+                        .spaceTop(PADDING_SMALL)
+                        .spaceBottom(PADDING_SMALL)
+                        .spaceLeft(PADDING_LARGE * 2)
+                        .spaceRight(PADDING_LARGE * 2)
+                        .uniformX()
+                        .left()
+
+                    row()
+                    label("Health", LABEL_LARGE_STYLE)
+                    label("Attack", LABEL_LARGE_STYLE)
+                    label("Defense", LABEL_LARGE_STYLE)
+                    label("Precision", LABEL_LARGE_STYLE)
+
+                    row()
+                    label("${BattleConstants.PLAYER_BONUS_HEALTH} + (Physique + Power + Caution) x 5", "stat-value")
+                    label("Physique + Power + Aggression", "stat-value")
+                    label("Physique + Finesse + Caution", "stat-value")
+                    label("Physique + Finesse + Aggression", "stat-value")
+
+                    row().fillX().uniformY().top()
+                    label("Reduced by attacks; if reduced to 0, character falls.") {
+                        wrap = true
+                    }
+                    label("Increases damage dealt by attacks and physical skills.") {
+                        wrap = true
+                    }
+                    label("Decreases damage from all attacks.") {
+                        wrap = true
+                    }
+                    label("Increases crit rate and effectiveness of bonus effects of physical skills.") {
+                        wrap = true
+                    }
+
+                    row().spaceTop(PADDING_LARGE)
+                    label("Mana", LABEL_LARGE_STYLE)
+                    label("Magic Attack", LABEL_LARGE_STYLE)
+                    label("Healing", LABEL_LARGE_STYLE)
+                    label("Spellcraft", LABEL_LARGE_STYLE)
+
+                    row()
+                    label("${BattleConstants.PLAYER_BONUS_MANA} + (Spirit + Power + Caution) x 2", "stat-value")
+                    label("Spirit + Power + Aggression", "stat-value")
+                    label("Spirit + Finesse + Caution", "stat-value")
+                    label("Spriit + Finesse + Agression", "stat-value")
+
+                    row().fillX().uniformY().top()
+                    label("Resource required to use skills. Regenerates by 25% of max value every turn.") {
+                        wrap = true
+                    }
+                    label("Increases damage dealt by magic skills.") {
+                        wrap = true
+                    }
+                    label("Increases effectiveness of healing skills.") {
+                        wrap = true
+                    }
+                    label("Increases effectiveness of bonus effects of spells.") {
+                        wrap = true
+                    }
+
+                }
+            }.let {
+                contentTable.add(it).colspan(battlers.size)
+            }
+
+            button("Exit")
 
             show(this@BattleScreenView.stage)
         }

@@ -11,6 +11,8 @@ object UiConstants {
     const val PADDING_SMALL = 4f
     const val PADDING_X_SMALL = 2f
 
+    const val FONT_SIZE_PRIMARY_LARGE = 22
+
     const val HEALTH_BAR_WIDTH = 300f
     const val HEALTH_BAR_HEIGHT = 20f
     const val HEALTH_BAR_PADDING = 2f

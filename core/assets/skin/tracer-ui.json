@@ -47,6 +47,12 @@ com.badlogic.gdx.graphics.Color: {
 		b: 1
 		a: 1
 	}
+	highlight: {
+		r: 0.15
+		g: 0.5
+		b: 1
+		a: 1
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	button-c: {
@@ -259,6 +265,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle: {
 		down: info-p
 		checked: info-selected-c
 	}
+	info-uncheckable: {
+		up: info-c,
+		down: info-p
+	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle: {
 	default: {
@@ -336,6 +346,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 	sub-title: {
 		font: sub-title
 		fontColor: color
+	},
+	stat-value: {
+		font: font
+		fontColor: highlight
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
@@ -388,6 +402,10 @@ com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 	default-vertical: {
 		background: progress-bar-c
 		knob: slider-knob-vertical-c
+	}
+	stat-slider: {
+		background: progress-bar-c,
+		knob: radio-on-c
 	}
 }
 com.badlogic.gdx.scenes.scene2d.ui.SplitPane$SplitPaneStyle: {

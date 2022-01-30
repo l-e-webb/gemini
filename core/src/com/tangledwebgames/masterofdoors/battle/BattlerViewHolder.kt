@@ -2,6 +2,7 @@ package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.tangledwebgames.masterofdoors.HEALTH_BAR_STYLE
+import com.tangledwebgames.masterofdoors.LABEL_LARGE_STYLE
 import com.tangledwebgames.masterofdoors.MANA_BAR_STYLE
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.skin
@@ -11,16 +12,14 @@ import ktx.scene2d.KTableWidget
 class BattlerViewHolder(
     var battlerId: String,
     val rootTable: KTableWidget = KTableWidget(skin),
-    val nameLabel: Label = Label("", skin),
+    val nameLabel: Label = Label("", skin, LABEL_LARGE_STYLE),
     val healthBar: HealthBar = HealthBar(
-        labelStyle = "sub-title",
         progressBarStyle = HEALTH_BAR_STYLE,
         labelGenerator = { current, max ->
             "Health: $current / $max"
         }
     ),
     val manaBar: HealthBar? = HealthBar(
-        labelStyle = "sub-title",
         progressBarStyle = MANA_BAR_STYLE,
         labelGenerator = { current, max ->
             "Mana: $current / $max"

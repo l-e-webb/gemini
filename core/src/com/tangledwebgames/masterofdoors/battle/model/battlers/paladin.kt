@@ -10,12 +10,13 @@ fun paladin(): Battler = Battler(
     id = "paladin",
     name = "Paladin",
     isEnemy = false,
-    physique = 6,
-    spirit = 4,
+    physique = 7,
+    spirit = 3,
     power = 5,
     finesse = 5,
     aggression = 3,
     caution = 7,
     bonusHealth = BattleConstants.PLAYER_BONUS_HEALTH,
+    bonusMana = BattleConstants.PLAYER_BONUS_MANA,
     skills = mutableListOf(Guard, Heal, BeatBack)
 )

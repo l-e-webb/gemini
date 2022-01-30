@@ -19,6 +19,9 @@ class BattlePresenter(
 
     init {
         battle.addBattleEventListener(::onBattleEvent)
+        battleScreenView.onInfoButtonClick = {
+            battleScreenView.showStatusDialog(battle.battlers)
+        }
     }
 
     var pendingAction: BattleAction? = null

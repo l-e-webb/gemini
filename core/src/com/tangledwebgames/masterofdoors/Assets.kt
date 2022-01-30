@@ -1,6 +1,7 @@
 package com.tangledwebgames.masterofdoors
 
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import ktx.assets.Asset
@@ -11,6 +12,7 @@ object Assets : AssetManager() {
     lateinit var skinAsset: Asset<Skin>
     lateinit var arialFontGenerator: Asset<FreeTypeFontGenerator>
     lateinit var arialBoldFontGenerator: Asset<FreeTypeFontGenerator>
+    lateinit var blackPanelNinePatch: Asset<Texture>
 
     fun init() {
         skinAsset = load("skin/tracer-ui.json")
@@ -18,5 +20,6 @@ object Assets : AssetManager() {
         FreeTypeFontGenerator.setMaxTextureSize(2048)
         arialFontGenerator = load("arial.ttf")
         arialBoldFontGenerator = load("arial-bold.ttf")
+        blackPanelNinePatch = load("black_panel.png")
     }
 }
