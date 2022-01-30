@@ -2,8 +2,7 @@ package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.scenes.scene2d.Action
-import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.*
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
@@ -13,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.utils.Align
 import com.tangledwebgames.masterofdoors.LABEL_LARGE_STYLE
+import com.tangledwebgames.masterofdoors.STAT_VALUE_LARGE_STYLE
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_IN_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_INITIAL_ALPHA
@@ -28,7 +28,9 @@ import com.tangledwebgames.masterofdoors.battle.model.BattleConstants
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.skin
 import com.tangledwebgames.masterofdoors.status.statusView
+import com.tangledwebgames.masterofdoors.util.textProperty
 import ktx.actors.alpha
+import ktx.actors.contains
 import ktx.actors.onClick
 import ktx.actors.then
 import ktx.scene2d.*
@@ -50,6 +52,7 @@ class BattleScreenView(val stage: Stage) {
     private val logVerticalGroup: KVerticalGroup
 
     private val menuContainer: Container<KVerticalGroup>
+    private val infoLabel: Label
 
     init {
         stage.actors {
@@ -85,18 +88,41 @@ class BattleScreenView(val stage: Stage) {
                 }
             }
 
-            container {
+            table {
                 setFillParent(true)
                 pad(PADDING_LARGE)
+                defaults().space(PADDING_MEDIUM)
                 bottom().left()
                 container(KVerticalGroup()) {
-                    background = skin["panel"]
-                    fillX().bottom().pad(PADDING_MEDIUM).prefWidth(300f)
+                    it.width(300f).fillX()
+                    background = this@table.skin["panel"]
+                    fillX().pad(PADDING_MEDIUM)
                     actor.apply {
                         grow()
                         space(PADDING_MEDIUM)
                     }
                     menuContainer = this
+                }
+
+                row()
+                table { cell ->
+                    cell.width(300f).height(150f).fill()
+                    background = skin["panel"]
+                    pad(PADDING_MEDIUM)
+                    defaults().space(PADDING_MEDIUM)
+
+                    row()
+                    label("Info", "title") {
+                        it.left()
+                    }
+
+                    row()
+                    label("") {
+                        it.grow()
+                        setAlignment(Align.topLeft)
+                        wrap = true
+                        infoLabel = this
+                    }
                 }
             }
 
@@ -146,7 +172,10 @@ class BattleScreenView(val stage: Stage) {
     }
 
     var onMenuItemClick: (String) -> Unit = {}
+    var onMenuItemOver: (BattleMenuItem?) -> Unit = {}
     var onInfoButtonClick: () -> Unit = {}
+
+    var infoText: String by infoLabel.textProperty()
 
     var menuItems: List<BattleMenuItem> by Delegates.observable(emptyList()) { _, old, new ->
         if (old != new) {
@@ -154,9 +183,35 @@ class BattleScreenView(val stage: Stage) {
                 clearChildren()
                 for (item in new) {
                     textButton(item.text) {
+                        padLeft(PADDING_MEDIUM).padRight(PADDING_MEDIUM)
+                        label.setAlignment(Align.left)
+                        item.endText?.let { text ->
+                            label(text, STAT_VALUE_LARGE_STYLE)  {
+                                it.right()
+                            }
+                        }
                         onClick {
                             onMenuItemClick(item.id)
                         }
+                        addListener(object : InputListener() {
+                            override fun enter(
+                                event: InputEvent?,
+                                x: Float,
+                                y: Float,
+                                pointer: Int,
+                                fromActor: Actor?
+                            ) {
+                                super.enter(event, x, y, pointer, fromActor)
+                                onMenuItemOver(item)
+                            }
+
+                            override fun exit(event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?) {
+                                super.exit(event, x, y, pointer, toActor)
+                                if (toActor?.let { a -> menuContainer.actor?.contains(a) } != true) {
+                                    onMenuItemOver(null)
+                                }
+                            }
+                        })
                     }
                 }
             }

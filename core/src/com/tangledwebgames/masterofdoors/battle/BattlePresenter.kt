@@ -22,6 +22,9 @@ class BattlePresenter(
         battleScreenView.onInfoButtonClick = {
             battleScreenView.showStatusDialog(battle.battlers)
         }
+        battleScreenView.onMenuItemOver = {
+            updateInfoText(it)
+        }
     }
 
     var pendingAction: BattleAction? = null
@@ -78,8 +81,8 @@ class BattlePresenter(
     fun showActionMenu() {
         battleScreenView.setMenu(
             listOf(
-                BattleMenuItem(Attack.name, Attack.id),
-                BattleMenuItem("Skills", "skill")
+                BattleMenuItem(id = Attack.id, text = Attack.name),
+                BattleMenuItem(id = "skill", text = "Skills")
             )
         ) {
             when (it) {
@@ -100,9 +103,9 @@ class BattlePresenter(
         }
 
         targets.map { target ->
-            BattleMenuItem(text = target.name, id = target.id)
+            BattleMenuItem(id = target.id, text = target.name)
         }.let { menuItems ->
-            menuItems + BattleMenuItem("Back", "back")
+            menuItems + BattleMenuItem(id = "back", text = "Back")
         }.let { menuItems ->
             battleScreenView.setMenu(menuItems) { id ->
                 if (id == "back") {
@@ -123,14 +126,17 @@ class BattlePresenter(
                 }
             }
         }
-
     }
 
     fun showSkillMenu() {
         val playerBattler = battle.getCurrentPlayerBattler() ?: return
         val menuItems = playerBattler.skills.map {
-            BattleMenuItem(text = it.name, id = it.id)
-        } + BattleMenuItem("Back", "back")
+            BattleMenuItem(
+                id = it.id,
+                text = it.name,
+                endText = it.manaCost.toString()
+            )
+        } + BattleMenuItem(id = "back", text = "Back")
         battleScreenView.setMenu(menuItems) { id ->
             if (id == "back") {
                 showActionMenu()
@@ -225,6 +231,20 @@ class BattlePresenter(
                 "quit" -> Gdx.app.exit()
             }
         }
+    }
+
+    fun updateInfoText(highlightedItem: BattleMenuItem?) {
+        if (highlightedItem == null) {
+            battleScreenView.infoText = ""
+            return
+        }
+
+        battleScreenView.infoText = battle
+            .getCurrentPlayerBattler()
+            ?.skills
+            ?.firstOrNull { it.id == highlightedItem.id }
+            ?.name
+            ?: ""
     }
 
     fun clear() {
