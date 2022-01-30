@@ -1,16 +1,24 @@
 package com.tangledwebgames.masterofdoors.status
 
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.utils.Align
+import com.tangledwebgames.masterofdoors.HIGHLIGHTABLE_BUTTON_STYLE
 import com.tangledwebgames.masterofdoors.STAT_VALUE_LARGE_STYLE
+import com.tangledwebgames.masterofdoors.STAT_VALUE_STYLE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
+import com.tangledwebgames.masterofdoors.battle.model.BattleAction
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import ktx.scene2d.*
 import ktx.style.get
 
-fun KTableWidget.statusView(battler: Battler) {
+fun KTableWidget.statusView(
+    battler: Battler, onSkillSelect: (BattleAction?) -> Unit = {}
+) {
     clear()
     pad(PADDING_LARGE)
     defaults().space(PADDING_LARGE)
@@ -161,6 +169,54 @@ fun KTableWidget.statusView(battler: Battler) {
             row()
             label("Healing") { it.left() }
             label(battler.healing.toString(), STAT_VALUE_LARGE_STYLE) { it.right() }
+        }
+    }
+
+    row()
+    table { cell ->
+        cell.growX().height(100f).fillY()
+        background = this@statusView.skin["panel"]
+        pad(PADDING_MEDIUM)
+        defaults().space(PADDING_LARGE)
+        val v1: KVerticalGroup
+        val v2: KVerticalGroup
+        container {
+            it.grow()
+            fill().prefWidth(0f).minWidth(0f)
+            v1 = verticalGroup {
+                space(PADDING_SMALL).grow()
+            }
+        }
+        container {
+            it.grow()
+            fill().prefWidth(0f).minWidth(0f)
+            v2 = verticalGroup {
+                space(PADDING_SMALL).grow()
+            }
+        }
+        battler.skills.forEachIndexed { index, action ->
+            if ((index % 2) == 0) {
+                v1
+            } else {
+                v2
+            }.textButton(action.name, HIGHLIGHTABLE_BUTTON_STYLE) {
+                label.setAlignment(Align.left)
+                label(action.manaCost.toString(), STAT_VALUE_STYLE)
+
+                addListener(object : InputListener() {
+                    override fun enter(
+                        event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?
+                    ) {
+                        onSkillSelect(action)
+                    }
+
+                    override fun exit(
+                        event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?
+                    ) {
+                        onSkillSelect(null)
+                    }
+                })
+            }
         }
     }
 }

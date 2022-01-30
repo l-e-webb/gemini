@@ -66,7 +66,11 @@ com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable: {
 	button-over-c: {
 		name: button-over
 		color: color
-	}
+	},
+	button-checked-c: {
+		name: button-over
+		color: highlight
+	},
 	title-bg-c: {
 		name: title-bg
 		color: color
@@ -355,7 +359,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
 com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle: {
 	default: {
 		font: font
-		fontColorSelected: white
+		fontColorSelected: black
 		fontColorUnselected: color
 		selection: color
 		background: list-c
@@ -426,7 +430,18 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 		down: button-pressed-c
 		over: button-over-c
 	}
-}
+	checkable: {
+		font: font
+		fontColor: color
+		downFontColor: black
+		overFontColor: black
+		checkedFontColor: black
+		up: button-c
+		down: button-pressed-c
+		over: button-over-c
+		checked: button-checked-c
+	}
+},
 com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 	default: {
 		font: font

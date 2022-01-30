@@ -19,10 +19,7 @@ import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_PADDING
 import com.tangledwebgames.masterofdoors.UiConstants.MANA_BAR_COLOR
 import ktx.freetype.generateFont
 import ktx.scene2d.Scene2DSkin.defaultSkin
-import ktx.style.add
-import ktx.style.get
-import ktx.style.label
-import ktx.style.progressBar
+import ktx.style.*
 
 const val HEALTH_BAR_STYLE: String = "health_bar_style"
 const val MANA_BAR_STYLE: String = "mana_bar_style"
@@ -32,6 +29,8 @@ const val LABEL_LARGE_STYLE: String = "label_large"
 const val STAT_VALUE_LARGE_STYLE = "stat_value_large"
 const val STAT_VALUE_STYLE = "stat-value"
 const val BOXED_METADATA_STYLE = "boxed_metadata"
+const val SELECTABLE_BUTTON_STYLE = "selectable_button"
+const val HIGHLIGHTABLE_BUTTON_STYLE = "highlightable_button"
 
 const val POPUP_FONT: String = "popup_font"
 const val DAMAGE_POPUP_STYLE: String = "damage_popup"
@@ -107,6 +106,21 @@ private fun initSkin(skin: Skin) = with(skin) {
 
     label(HEAL_POPUP_STYLE, extend = GENERIC_POPUP_STYLE) {
         fontColor = HEALING_POPUP_COLOR
+    }
+
+    textButton(HIGHLIGHTABLE_BUTTON_STYLE) {
+        font = get("font")
+        fontColor = Color.WHITE
+        over = newDrawable("progress-bar-c")
+            ?.let { it as? SpriteDrawable }
+            ?.tint(Color.GRAY)
+
+    }
+
+    textButton(SELECTABLE_BUTTON_STYLE, extend = HIGHLIGHTABLE_BUTTON_STYLE) {
+        checked = newDrawable("progress-bar-c")
+        checkedFontColor = Color.BLACK
+
     }
 
     progressBar(HEALTH_BAR_STYLE) {
