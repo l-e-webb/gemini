@@ -13,6 +13,13 @@ object Heal : BattleAction {
     override val name: String = "Heal"
     override val manaCost: Int = 12
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
+    override val description: String
+        get() = """
+            Restores Health to one ally.
+            Base power: 20
+        """.trimIndent()
+
+    val baseHealing = 20
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return target.isAlly(actor) &&
@@ -22,7 +29,8 @@ object Heal : BattleAction {
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> {
         actor.mana -= manaCost
-        target.health = (target.health + actor.healing).coerceIn(0, target.maxHealth)
+        val healing = (baseHealing * actor.healing) / 10
+        target.health = (target.health + healing).coerceIn(0, target.maxHealth)
 
         return listBuilder {
             viewStateChange {
@@ -32,8 +40,8 @@ object Heal : BattleAction {
             }.also { add(it) }
 
             viewStateChange {
-                logMessage = "${target.name} was healed by ${actor.healing}!"
-                healingPopup(target.id, actor.healing)
+                logMessage = "${target.name} was healed by $healing!"
+                healingPopup(target.id, healing)
                 statusChange(battlerId = target.id, health = target.health)
                 wait = WAIT_AFTER_DAMAGE_OR_HEALING
             }.also { add(it) }

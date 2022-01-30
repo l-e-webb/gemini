@@ -16,7 +16,11 @@ object BeatBack : BattleAction {
     override val name: String = "Beat Back"
     override val manaCost: Int = 12
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
-
+    override val description: String
+        get() = """
+        Physical attack which also applies Damage Down to target. Damage is reduced by 25% - 50% for 2 - 5 turns, depending on Precision vs. Defense check.
+        Base power: $baseDamage
+    """.trimIndent()
     val baseDamage: Int = Attack.baseDamage
 
     override fun isValid(actor: Battler, target: Battler): Boolean {

@@ -10,6 +10,9 @@ interface BattleAction {
     val name: String
     val manaCost: Int
     val targetType: TargetType
+    val description: String
+
+    fun infoText(): String = "$name ($manaCost Mana)\n$description"
 
     fun isValid(actor: Battler, target: Battler): Boolean
 

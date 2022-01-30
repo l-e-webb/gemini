@@ -79,6 +79,8 @@ class BattlePresenter(
     }
 
     fun showActionMenu() {
+        pendingAction = null
+        updateInfoText(null)
         battleScreenView.setMenu(
             listOf(
                 BattleMenuItem(id = Attack.id, text = Attack.name),
@@ -101,6 +103,8 @@ class BattlePresenter(
         val targets = battle.battlers.filter {
             pendingAction.isValid(playerBattler, it)
         }
+
+        updateInfoText(null)
 
         targets.map { target ->
             BattleMenuItem(id = target.id, text = target.name)
@@ -129,6 +133,8 @@ class BattlePresenter(
     }
 
     fun showSkillMenu() {
+        pendingAction = null
+        updateInfoText(null)
         val playerBattler = battle.getCurrentPlayerBattler() ?: return
         val menuItems = playerBattler.skills.map {
             BattleMenuItem(
@@ -234,17 +240,18 @@ class BattlePresenter(
     }
 
     fun updateInfoText(highlightedItem: BattleMenuItem?) {
-        if (highlightedItem == null) {
-            battleScreenView.infoText = ""
-            return
-        }
-
-        battleScreenView.infoText = battle
-            .getCurrentPlayerBattler()
-            ?.skills
-            ?.firstOrNull { it.id == highlightedItem.id }
-            ?.name
-            ?: ""
+        battleScreenView.infoText = highlightedItem
+            ?.id
+            ?.let { id ->
+                if (id == Attack.id) {
+                    Attack.infoText()
+                } else {
+                    battle.getCurrentPlayerBattler()
+                        ?.skills
+                        ?.firstOrNull { it.id == id }
+                        ?.infoText()
+                }
+            } ?: pendingAction?.infoText() ?: ""
     }
 
     fun clear() {

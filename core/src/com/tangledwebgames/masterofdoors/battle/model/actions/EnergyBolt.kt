@@ -10,7 +10,11 @@ object EnergyBolt : BattleAction {
     override val name: String = "Energy Bolt"
     override val manaCost: Int = 15
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
-
+    override val description: String
+        get() = """
+            Basic magic attack, deals damage to one target.
+            Base power: $baseDamage
+        """.trimIndent()
     val baseDamage: Int = 40
 
     override fun isValid(actor: Battler, target: Battler): Boolean {

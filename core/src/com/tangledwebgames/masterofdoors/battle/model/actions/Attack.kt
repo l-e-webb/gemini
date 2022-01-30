@@ -12,6 +12,8 @@ object Attack : BattleAction {
     override val name: String = "Attack"
     override val manaCost: Int = 0
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
+    override val description: String
+        get() = "Attack a single enemy. Costs no mana.\nBase power: $baseDamage"
 
     val baseDamage: Int = 25
 

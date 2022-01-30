@@ -13,12 +13,13 @@ object Guard : BattleAction {
     const val GUARDING_STATUS_EFFECT_NAME = "Guarding"
 
     override val id: String = "guard"
-
     override val name: String = "Guard"
-
     override val manaCost: Int = 8
-
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
+    override val description: String
+        get() = """
+            Enter Guarding state for 3 turns. While Guarding, attacks directed at ally may be redirected to self. Incidence rate based on Precision.
+        """.trimIndent()
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return actor == target &&
