@@ -1,0 +1,12 @@
+{
+  "platform": "windows64",
+  "jdk": "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home",
+  "executable": "master_of_doors_win",
+  "classpath": ["desktop/build/libs/desktop-1.0.jar"],
+  "mainclass": "com.tangledwebgames.masterofdoors.desktop.DesktopLauncher",
+  "vmargs": [
+    "Xms128m", "Xmx1500m"
+  ],
+  "resources": ["core/assets"],
+  "output": "desktop/build/dist/windows/master_of_doors"
+}
