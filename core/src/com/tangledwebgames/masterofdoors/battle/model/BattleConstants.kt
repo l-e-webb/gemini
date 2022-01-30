@@ -2,6 +2,9 @@ package com.tangledwebgames.masterofdoors.battle.model
 
 object BattleConstants {
 
+    const val POISON_ID = "poison"
+    const val INCOMING_DAMAGE_UP_ID = "incoming_damage_up"
+
     const val MANA_REGEN_RATIO = 25
     const val PLAYER_BONUS_HEALTH = 50
     const val PLAYER_BONUS_MANA = 20

@@ -1,6 +1,9 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
+import com.badlogic.gdx.Gdx
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MANA_REGEN_RATIO
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
+import com.tangledwebgames.masterofdoors.util.listBuilder
 import com.tangledwebgames.masterofdoors.util.reciproal
 import com.tangledwebgames.masterofdoors.util.times
 import kotlin.random.Random
@@ -60,28 +63,66 @@ object BattleFunctions {
     fun statCheck(
         stat: Int, modifier: Int, difficulty: Int
     ): Int {
-        return stat + modifier - difficulty + Random.nextInt(-5, 5)
+        Gdx.app.log(BattleFunctions::class.simpleName, "Stat check: $stat + $modifier vs $difficulty")
+        return (stat + modifier - difficulty + Random.nextInt(-5, 5)).also {
+            Gdx.app.log(BattleFunctions::class.simpleName, "Outcome: $it")
+        }
     }
 
-    fun onTurnStart(battler: Battler): List<BattleEvent> {
+    fun onTurnStart(battler: Battler): List<BattleEvent> = listBuilder {
         if (!battler.isEnemy) {
             battler.mana = (battler.mana + battler.maxMana / MANA_REGEN_RATIO).coerceIn(0, battler.maxMana)
         }
 
-        battler.statusEffects.forEach { effect ->
-            effect.adjustDuration(-1)
-        }
-        battler.statusEffects.filter { effect ->
-            effect.duration?.let { it <= 0 } ?: false
+        val healthChange: Int = battler.statusEffects.sumOf {
+            (it.damageOverTime?.times(-1) ?: 0) +
+                    (it.healingOverTime ?: 0)
         }
 
-        // TODO
+        battler.health = (battler.health + healthChange).coerceIn(0, battler.maxHealth)
+
+        if (battler.isAlive()) {
+            battler.statusEffects
+                .filter { effect ->
+                    !effect.removeAtTurnEnd
+                }.forEach { effect ->
+                    effect.adjustDuration(-1)
+                    if (effect.duration?.let { it <= 0 } == true) {
+                        battler.statusEffects.remove(effect)
+                    }
+                }
+        }
+
+        return viewStateChange {
+            if (healthChange > 0) {
+                healingPopup(battler.id, healthChange)
+            } else if (healthChange < 0) {
+                damagePopup(battler.id, healthChange)
+            }
+            statusChange(
+                battlerId = battler.id,
+                health = battler.health,
+                mana = battler.mana,
+                statusEffects = battler.statusEffects.deepCopy()
+            )
+            wait = MEDIUM_BATTLE_WAIT
+        }.let { listOf(it) }
+    }
+
+    fun onTurnEnd(battler: Battler): List<BattleEvent> {
+        battler.statusEffects
+            .filter { effect -> effect.removeAtTurnEnd }
+            .forEach { effect ->
+                effect.adjustDuration(-1)
+                if (effect.duration?.let { it <= 0 } == true) {
+                    battler.statusEffects.remove(effect)
+                }
+            }
 
         return viewStateChange {
             statusChange(
                 battlerId = battler.id,
-                mana = battler.mana,
-                statusEffects = battler.statusEffects.toList()
+                statusEffects = battler.statusEffects.deepCopy()
             )
         }.let { listOf(it) }
     }

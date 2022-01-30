@@ -152,20 +152,29 @@ class BattleScreenView(val stage: Stage) {
             BattlerViewHolder(battlerId = battlerId, manaBar = null)
         }
         viewHolder.rootTable.apply {
-            if (includeBackground) {
-                background = skin["panel"]
-                pad(PADDING_MEDIUM)
+            debugCell()
+            actor(viewHolder.statusEffectGroup) {
+                it.height(0f).bottom().fillX()
+                wrap().pad(PADDING_SMALL).left().bottom().space(PADDING_SMALL)
             }
-            defaults().space(PADDING_MEDIUM)
-
-            actor(viewHolder.nameLabel) { it.left() }
 
             row()
-            actor(viewHolder.healthBar.rootTable)
+            table {
+                if (includeBackground) {
+                    background = skin["panel"]
+                    pad(PADDING_MEDIUM)
+                }
+                defaults().space(PADDING_MEDIUM)
 
-            viewHolder.manaBar?.let {
+                actor(viewHolder.nameLabel) { it.left() }
+
                 row()
-                actor(it.rootTable)
+                actor(viewHolder.healthBar.rootTable)
+
+                viewHolder.manaBar?.let {
+                    row()
+                    actor(it.rootTable)
+                }
             }
         }
         return viewHolder

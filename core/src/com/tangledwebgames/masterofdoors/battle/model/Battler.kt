@@ -83,6 +83,9 @@ data class Battler(
         id: String,
         name: String,
         duration: Int? = null,
+        removeAtTurnEnd: Boolean = false,
+        damageOverTime: Int? = null,
+        healingOverTIme: Int? = null,
         statSet: StatSet = StatSet()
     ) {
         statusEffects.firstOrNull { it.id == id }
@@ -97,6 +100,9 @@ data class Battler(
                 name = name,
                 battlerId = this@Battler.id,
                 duration = duration,
+                removeAtTurnEnd = removeAtTurnEnd,
+                damageOverTime = damageOverTime,
+                healingOverTime = healingOverTIme,
                 statSet = statSet
             )
         )

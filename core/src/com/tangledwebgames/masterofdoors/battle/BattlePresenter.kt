@@ -204,7 +204,9 @@ class BattlePresenter(
                     change.mana?.let {
                         mana = it
                     }
-                    // TODO: status effects
+                    change.statusEffects?.let {
+                        setStatusEffects(it)
+                    }
                 }
             }
         }

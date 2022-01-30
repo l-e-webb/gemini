@@ -1,6 +1,7 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
 import com.badlogic.gdx.Gdx
+import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.onTurnEnd
 import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.onTurnStart
 
 data class Battle(
@@ -168,6 +169,10 @@ data class Battle(
             ?.let { action.execute(actor, targets) }
             ?.forEach { pushBattleEvent(it) }
             ?: Gdx.app.log(Battle::class.simpleName, "Action invoked with no valid targets.")
+
+        if (actor.isAlive() && !checkEndBattle()) {
+            onTurnEnd(actor).forEach { pushBattleEvent(it) }
+        }
     }
 
     fun checkEndBattle(): Boolean {

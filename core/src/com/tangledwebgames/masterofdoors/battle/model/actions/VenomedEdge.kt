@@ -1,27 +1,28 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
+import com.badlogic.gdx.Gdx
 import com.tangledwebgames.masterofdoors.battle.model.*
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.POISON_ID
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
 import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.calculatePhysicalDamage
 import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.statCheck
 import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.statCheckPassFail
 import com.tangledwebgames.masterofdoors.util.listBuilder
 
-object BeatBack : BattleAction {
+object VenomedEdge : BattleAction {
 
-    const val DAMAGE_DOWN_ID = "damage_down"
-
-    override val id: String = "beat_back"
-    override val name: String = "Beat Back"
-    override val manaCost: Int = 12
+    override val id: String = "venomed_edge"
+    override val name: String = "Venomed Edge"
+    override val manaCost: Int = 15
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
-        Physical attack which also applies Damage Down to target. Damage is reduced by 25% - 50% for 2 - 5 turns, depending on Precision vs. Defense check.
-        Base power: $baseDamage
-    """.trimIndent()
-    val baseDamage: Int = Attack.baseDamage
+            Physical attack with chance to poison. Severity and duration of poison depend on Precision vs Defense check.
+            Base power: $baseDamage
+        """.trimIndent()
+
+    val baseDamage = Attack.baseDamage
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return target.isAlive() && !target.isAlly(actor)
@@ -29,21 +30,21 @@ object BeatBack : BattleAction {
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> = listBuilder {
         actor.mana -= manaCost
+        viewStateChange {
+            logMessage = "${actor.name} strikes with a poisoned weapon!"
+            statusChange(battlerId = actor.id, mana = actor.mana)
+            wait = WAIT_AFTER_ACTION_DECLARATION
+        }.also { add(it) }
+
         val isCrit = statCheckPassFail(
             stat = actor.precision,
             modifier = -5,
             difficulty = target.defense
         )
-
         val damage = calculatePhysicalDamage(
             actor = actor, target = target, baseDamage = baseDamage, isCrit = isCrit
         )
-
-        viewStateChange {
-            logMessage = "${actor.name} beats ${target.name} back!"
-            wait = WAIT_AFTER_ACTION_DECLARATION
-            statusChange(battlerId = actor.id, mana = actor.mana)
-        }.also { add(it) }
+        target.health = (target.health - damage).coerceAtLeast(0)
 
         add(damageViewStateChange(target = target, damage = damage, isCrit = isCrit))
 
@@ -53,36 +54,41 @@ object BeatBack : BattleAction {
 
         if (!target.isAlive()) {
             add(targetDiesViewStateChange(target))
-        }
+        } else if (damage > 0) {
+            var success = false
 
-        if (damage > 0 && target.isAlive()) {
-            var success: Boolean = false
             val precisionCheck = statCheck(
                 stat = actor.precision,
                 modifier = 0,
                 difficulty = target.defense
             )
-            val damageDownName: String
-            val damageDownRate: Pair<Int, Int>
-            if (precisionCheck > 3) {
-                damageDownRate = 1 to 2
-                damageDownName = "Damage -50%"
-            } else {
-                damageDownRate = 3 to 4
-                damageDownName = "Damage -25%"
+            val poisonDamage: Int
+            val duration: Int
+            when {
+                precisionCheck < 5 -> return@listBuilder
+                precisionCheck < 3 -> {
+                    duration = 1
+                    poisonDamage = actor.precision / 3
+                }
+                precisionCheck < 0 -> {
+                    duration = 2
+                    poisonDamage = actor.precision / 3
+                }
+                precisionCheck < 4 -> {
+                    duration = 3
+                    poisonDamage = actor.precision / 3
+                }
+                else -> {
+                    duration = 3
+                    poisonDamage = actor.precision / 2
+                }
             }
-            val duration = when {
-                precisionCheck < 4 -> 1
-                precisionCheck < 0 -> 2
-                precisionCheck == 0 -> 3
-                precisionCheck < 4 -> 4
-                else -> 5
-            }
-            target.statusEffects.firstOrNull { it.id == DAMAGE_DOWN_ID }
+
+            target.statusEffects.firstOrNull { it.id == POISON_ID }
                 ?.let { effect ->
-                    if (effect.statSet.damageMultiplier.first < damageDownRate.first) {
-                        effect.statSet.damageMultiplier = damageDownRate
-                        effect.name = damageDownName
+                    if (effect.damageOverTime?.let { it > poisonDamage } != true) {
+                        effect.damageOverTime = poisonDamage
+                        effect.name = "Poison ($poisonDamage)"
                         success = true
                     }
                     if (effect.setDurationToLonger(duration)) {
@@ -90,18 +96,17 @@ object BeatBack : BattleAction {
                     }
                 } ?: run {
                 target.addStatusEffect(
-                    id = DAMAGE_DOWN_ID,
-                    name = damageDownName,
+                    id = POISON_ID,
+                    name = "Poison ($poisonDamage)",
                     duration = duration,
-                    removeAtTurnEnd = true,
-                    statSet = StatSet(damageMultiplier = damageDownRate)
+                    damageOverTime = poisonDamage
                 )
                 success = true
             }
 
             if (success) {
                 viewStateChange {
-                    logMessage = "${target.name} had their damage lowered."
+                    logMessage = "${target.name} was poisoned."
                     statusChange(
                         battlerId = target.id,
                         statusEffects = target.statusEffects.deepCopy()

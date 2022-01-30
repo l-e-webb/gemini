@@ -7,6 +7,7 @@ import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BOSS_FORM_
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.battlers.mage
 import com.tangledwebgames.masterofdoors.battle.model.battlers.paladin
+import com.tangledwebgames.masterofdoors.battle.model.battlers.rogue
 import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
@@ -22,7 +23,7 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
         presenter = BattlePresenter(view, battle)
         battle.playerBattlers.apply {
             add(paladin())
-            add(mage())
+            add(rogue())
         }
         battle.enemyBattlers.apply {
             add(

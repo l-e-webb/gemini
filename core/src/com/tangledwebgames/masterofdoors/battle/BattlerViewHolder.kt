@@ -1,13 +1,18 @@
 package com.tangledwebgames.masterofdoors.battle
 
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup
 import com.tangledwebgames.masterofdoors.HEALTH_BAR_STYLE
 import com.tangledwebgames.masterofdoors.LABEL_LARGE_STYLE
 import com.tangledwebgames.masterofdoors.MANA_BAR_STYLE
 import com.tangledwebgames.masterofdoors.battle.model.Battler
+import com.tangledwebgames.masterofdoors.battle.model.StatusEffect
 import com.tangledwebgames.masterofdoors.skin
 import com.tangledwebgames.masterofdoors.util.textProperty
 import ktx.scene2d.KTableWidget
+import ktx.scene2d.label
+import ktx.scene2d.scene2d
 
 class BattlerViewHolder(
     var battlerId: String,
@@ -24,7 +29,8 @@ class BattlerViewHolder(
         labelGenerator = { current, max ->
             "Mana: $current / $max"
         }
-    )
+    ),
+    val statusEffectGroup: HorizontalGroup = HorizontalGroup()
 ) {
     var name: String by nameLabel.textProperty()
     var maxHealth: Int by healthBar::maxValue
@@ -47,5 +53,18 @@ class BattlerViewHolder(
         health = battler.health
         maxMana = battler.maxMana
         mana = battler.mana
+        setStatusEffects(battler.statusEffects)
+
+    }
+
+    fun setStatusEffects(statusEffects: List<StatusEffect>) {
+        statusEffectGroup.clear()
+        statusEffects.map { statusEffect ->
+            statusEffect.duration?.let {
+                "${statusEffect.name} [$it]"
+            } ?: statusEffect.name
+        }.forEach { statusEffectText ->
+            statusEffectGroup.addActor(Label(statusEffectText, skin))
+        }
     }
 }
