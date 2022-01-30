@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BOSS_FORM_ONE_BONUS_HEALTH
 import com.tangledwebgames.masterofdoors.battle.model.Battler
-import com.tangledwebgames.masterofdoors.battle.model.battlers.mage
 import com.tangledwebgames.masterofdoors.battle.model.battlers.paladin
 import com.tangledwebgames.masterofdoors.battle.model.battlers.rogue
 import ktx.app.clearScreen

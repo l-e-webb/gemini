@@ -1,10 +1,8 @@
 package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.*
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
-import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
@@ -13,14 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.utils.Align
 import com.tangledwebgames.masterofdoors.LABEL_LARGE_STYLE
 import com.tangledwebgames.masterofdoors.STAT_VALUE_LARGE_STYLE
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_IN_TIME
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_FADE_TIME
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_INITIAL_ALPHA
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_INITIAL_SCALE
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_SCALE_UP_TIME
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_SHIFT_TIME
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_VERTICAL_SHIFT
-import com.tangledwebgames.masterofdoors.UiConstants.BATTLE_POPUP_WAIT_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
@@ -29,7 +19,6 @@ import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.skin
 import com.tangledwebgames.masterofdoors.status.statusView
 import com.tangledwebgames.masterofdoors.util.textProperty
-import ktx.actors.alpha
 import ktx.actors.contains
 import ktx.actors.onClick
 import ktx.actors.then
@@ -136,48 +125,7 @@ class BattleScreenView(val stage: Stage) {
                     }
                 }
             }
-
-
         }
-    }
-
-    fun battlerView(
-        battlerId: String,
-        includeBackground: Boolean,
-        includeManaBar: Boolean
-    ): BattlerViewHolder {
-        val viewHolder = if (includeManaBar) {
-            BattlerViewHolder(battlerId = battlerId)
-        } else {
-            BattlerViewHolder(battlerId = battlerId, manaBar = null)
-        }
-        viewHolder.rootTable.apply {
-            debugCell()
-            actor(viewHolder.statusEffectGroup) {
-                it.height(0f).bottom().fillX()
-                wrap().pad(PADDING_SMALL).left().bottom().space(PADDING_SMALL)
-            }
-
-            row()
-            table {
-                if (includeBackground) {
-                    background = skin["panel"]
-                    pad(PADDING_MEDIUM)
-                }
-                defaults().space(PADDING_MEDIUM)
-
-                actor(viewHolder.nameLabel) { it.left() }
-
-                row()
-                actor(viewHolder.healthBar.rootTable)
-
-                viewHolder.manaBar?.let {
-                    row()
-                    actor(it.rootTable)
-                }
-            }
-        }
-        return viewHolder
     }
 
     var onMenuItemClick: (String) -> Unit = {}
@@ -326,31 +274,6 @@ class BattleScreenView(val stage: Stage) {
                 )
             )
         }
-    }
-
-    fun showPopupText(target: String, text: String, labelStyle: String) {
-        val (x, y) = getViewHolder(target)
-            ?.rootTable
-            ?.let {
-                it.localToStageCoordinates(Vector2(it.width / 2, it.height / 2))
-            }?.let { it.x to it.y } ?: return
-
-        scene2d.label(text, labelStyle) {
-            width = prefWidth
-            height = prefHeight
-            setScale(BATTLE_POPUP_INITIAL_SCALE)
-            alpha = BATTLE_POPUP_INITIAL_ALPHA
-            setPosition(x, y, Align.center)
-            val action = Actions.parallel(
-                Actions.scaleTo(1f, 1f, BATTLE_POPUP_SCALE_UP_TIME),
-                Actions.alpha(1f, BATTLE_POPUP_FADE_IN_TIME),
-                Actions.moveToAligned(x, y + BATTLE_POPUP_VERTICAL_SHIFT, Align.center, BATTLE_POPUP_SHIFT_TIME)
-            ) then
-                    delay(BATTLE_POPUP_WAIT_TIME) then
-                    Actions.alpha(0f, BATTLE_POPUP_FADE_TIME) then
-                    Actions.removeActor()
-            addAction(action)
-        }.also { stage.addActor(it) }
     }
 
     fun enqueueAction(action: Action) {

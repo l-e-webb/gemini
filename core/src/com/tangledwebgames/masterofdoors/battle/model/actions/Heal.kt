@@ -1,11 +1,7 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
-import com.tangledwebgames.masterofdoors.battle.model.BattleAction
+import com.tangledwebgames.masterofdoors.battle.model.*
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_DAMAGE_OR_HEALING
-import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
-import com.tangledwebgames.masterofdoors.battle.model.Battler
-import com.tangledwebgames.masterofdoors.battle.model.viewStateChange
 import com.tangledwebgames.masterofdoors.util.listBuilder
 
 object Heal : BattleAction {
@@ -39,12 +35,7 @@ object Heal : BattleAction {
                 statusChange(battlerId = actor.id, mana = actor.mana)
             }.also { add(it) }
 
-            viewStateChange {
-                logMessage = "${target.name} was healed by $healing!"
-                healingPopup(target.id, healing)
-                statusChange(battlerId = target.id, health = target.health)
-                wait = WAIT_AFTER_DAMAGE_OR_HEALING
-            }.also { add(it) }
+            add(healViewStateChange(target = target, healing = healing))
         }
     }
 }

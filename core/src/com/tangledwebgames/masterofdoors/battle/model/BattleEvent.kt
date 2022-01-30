@@ -1,14 +1,20 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
+import com.badlogic.gdx.graphics.Color
 import com.tangledwebgames.masterofdoors.DAMAGE_POPUP_STYLE
 import com.tangledwebgames.masterofdoors.GENERIC_POPUP_STYLE
 import com.tangledwebgames.masterofdoors.HEAL_POPUP_STYLE
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.DAMAGE_FLASH_COLOR
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.EFFECT_FLASH_TIME
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.HEALING_FLASH_COLOR
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_DAMAGE_OR_HEALING
 
 sealed class BattleEvent {
     data class ViewStateChange(
         val logMessage: String? = null,
         val statusChanges: List<StatusChange>? = null,
         val textPopups: List<TextPopup>? = null,
+        val flashes: List<BattlerFlash>? = null,
         val special: String? = null,
         val wait: Float? = null
     ) : BattleEvent()
@@ -26,6 +32,12 @@ data class TextPopup(
     val battlerId: String,
     val text: String,
     val labelStyle: String
+)
+
+data class BattlerFlash(
+    val battlerId: String,
+    val color: Color,
+    val time: Float = EFFECT_FLASH_TIME
 )
 
 data class StatusChange(
@@ -47,6 +59,9 @@ class StateChangeBuilder {
 
     private val _textPopups = mutableListOf<TextPopup>()
     val textPopups: List<TextPopup> = _textPopups
+
+    private val _flashes = mutableListOf<BattlerFlash>()
+    val flashes: List<BattlerFlash> = _flashes
 
     fun damagePopup(battlerId: String, text: String) {
         _textPopups.add(TextPopup(battlerId, text, DAMAGE_POPUP_STYLE))
@@ -72,6 +87,14 @@ class StateChangeBuilder {
         _textPopups.add(TextPopup(battlerId, text, labelStyle))
     }
 
+    fun flash(
+        battlerId: String,
+        color: Color,
+        time: Float = EFFECT_FLASH_TIME
+    ) {
+        _flashes.add(BattlerFlash(battlerId, color, time))
+    }
+
     fun statusChange(
         battlerId: String,
         name: String? = null,
@@ -89,7 +112,7 @@ class StateChangeBuilder {
     }
 
     fun build(): BattleEvent.ViewStateChange = BattleEvent.ViewStateChange(
-        logMessage, statusChanges, textPopups, null, wait
+        logMessage, statusChanges, textPopups, flashes, null, wait
     )
 }
 
@@ -107,6 +130,7 @@ fun damageViewStateChange(target: Battler, damage: Int, isCrit: Boolean) = viewS
     } else {
         logMessage = "${target.name} takes $damage damage!"
         damagePopup(battlerId = target.id, amount = damage)
+        flash(battlerId = target.id, color = DAMAGE_FLASH_COLOR)
         statusChange(battlerId = target.id, health = target.health)
     }
     wait = if (isCrit) {
@@ -114,6 +138,14 @@ fun damageViewStateChange(target: Battler, damage: Int, isCrit: Boolean) = viewS
     } else {
         BattleConstants.WAIT_AFTER_DAMAGE_OR_HEALING
     }
+}
+
+fun healViewStateChange(target: Battler, healing: Int) = viewStateChange {
+    logMessage = "${target.name} was healed by $healing!"
+    healingPopup(target.id, healing)
+    flash(battlerId = target.id, color = HEALING_FLASH_COLOR)
+    statusChange(battlerId = target.id, health = target.health)
+    wait = WAIT_AFTER_DAMAGE_OR_HEALING
 }
 
 fun critViewStateChange() = viewStateChange {

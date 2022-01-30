@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleAction
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.HIGHLIGHTED_BATTLER_COLOR
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AT_START_OF_ENEMY_TURN
 import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
 import com.tangledwebgames.masterofdoors.battle.model.Battler
@@ -47,6 +48,7 @@ class BattlePresenter(
                         addBattlerView(it)
                     }
                 }
+                updateActiveBattlerTint(event.phase)
             }
             is BattleEvent.ViewStateChange -> {
                 applyViewStateChange(event)
@@ -183,8 +185,8 @@ class BattlePresenter(
                 battleScreenView.pushLogItem(it)
             }
             event.textPopups?.forEach {
-                battleScreenView.showPopupText(
-                    it.battlerId, it.text, it.labelStyle
+                battleScreenView.getViewHolder(it.battlerId)?.showPopupText(
+                    text = it.text, labelStyle = it.labelStyle
                 )
             }
             event.statusChanges?.forEach { change ->
@@ -208,6 +210,11 @@ class BattlePresenter(
                         setStatusEffects(it)
                     }
                 }
+            }
+
+            event.flashes?.forEach { flash ->
+                battleScreenView.getViewHolder(flash.battlerId)
+                    ?.flash(color = flash.color, time = flash.time)
             }
         }
         event.wait?.let {
@@ -254,6 +261,29 @@ class BattlePresenter(
                         ?.infoText()
                 }
             } ?: pendingAction?.infoText() ?: ""
+    }
+
+    fun updateActiveBattlerTint(phase: Battle.Phase) {
+        val activeBattlerId = when (phase) {
+            Battle.Phase.PLAYER_TURN_START, Battle.Phase.PLAYER_TURN ->
+                battle.getCurrentPlayerBattler()?.id
+            Battle.Phase.ENEMY_TURN -> battle.getCurrentEnemyBattler()?.id
+            else -> null
+        }
+
+        battleScreenView.enqueueAction(Actions.run {
+            battle.battlers
+                .mapNotNull { battleScreenView.getViewHolder(it.id) }
+                .forEach { viewHolder ->
+                    if (viewHolder.battlerId == activeBattlerId) {
+                        viewHolder.tint(color = HIGHLIGHTED_BATTLER_COLOR)
+                        viewHolder.showBoxedLabel("Turn")
+                    } else {
+                        viewHolder.fade()
+                        viewHolder.hideBoxedLabel()
+                    }
+                }
+        })
     }
 
     fun clear() {

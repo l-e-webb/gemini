@@ -31,6 +31,7 @@ const val FONT_LARGE: String = "font_large"
 const val LABEL_LARGE_STYLE: String = "label_large"
 const val STAT_VALUE_LARGE_STYLE = "stat_value_large"
 const val STAT_VALUE_STYLE = "stat-value"
+const val BOXED_METADATA_STYLE = "boxed_metadata"
 
 const val POPUP_FONT: String = "popup_font"
 const val DAMAGE_POPUP_STYLE: String = "damage_popup"
@@ -88,6 +89,11 @@ private fun initSkin(skin: Skin) = with(skin) {
 
     label(STAT_VALUE_LARGE_STYLE, extend = STAT_VALUE_STYLE) {
         font = skin[FONT_LARGE]
+    }
+
+    label(BOXED_METADATA_STYLE) {
+        font = skin["sub-title"]
+        background = skin["panel"]
     }
 
     label(GENERIC_POPUP_STYLE) {

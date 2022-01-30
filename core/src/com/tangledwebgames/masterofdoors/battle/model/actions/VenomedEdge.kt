@@ -1,6 +1,5 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
-import com.badlogic.gdx.Gdx
 import com.tangledwebgames.masterofdoors.battle.model.*
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.POISON_ID
