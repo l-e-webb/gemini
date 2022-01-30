@@ -2,7 +2,7 @@ package com.tangledwebgames.masterofdoors.battle.model
 
 object BattleConstants {
 
-    const val MANA_REGEN_RATIO = 10
+    const val MANA_REGEN_RATIO = 25
     const val PLAYER_BONUS_HEALTH = 50
 
     const val BOSS_FORM_ONE_BONUS_HEALTH = 400

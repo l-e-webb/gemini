@@ -1,9 +1,11 @@
 package com.tangledwebgames.masterofdoors.battle
 
+import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_HEIGHT
+import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_INTERPOLATION_TIME
 import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_PADDING
 import com.tangledwebgames.masterofdoors.UiConstants.HEALTH_BAR_WIDTH
 import com.tangledwebgames.masterofdoors.skin
@@ -48,6 +50,9 @@ class HealthBar(
                 }
             }
         }
+
+        progressBar.setAnimateDuration(HEALTH_BAR_INTERPOLATION_TIME)
+        progressBar.setAnimateInterpolation(Interpolation.smooth)
     }
 
     var currentValue: Int

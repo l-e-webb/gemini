@@ -14,6 +14,7 @@ object UiConstants {
     const val HEALTH_BAR_WIDTH = 300f
     const val HEALTH_BAR_HEIGHT = 20f
     const val HEALTH_BAR_PADDING = 2f
+    const val HEALTH_BAR_INTERPOLATION_TIME = 0.4f
 
     const val BATTLE_POPUP_INITIAL_SCALE = 0.5f
     const val BATTLE_POPUP_INITIAL_ALPHA = 0.5f

@@ -3,11 +3,10 @@ package com.tangledwebgames.masterofdoors.battle.model.actions
 import com.tangledwebgames.masterofdoors.battle.model.*
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
+import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.calculatePhysicalDamage
 import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.statCheck
 import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.statCheckPassFail
 import com.tangledwebgames.masterofdoors.util.listBuilder
-import com.tangledwebgames.masterofdoors.util.reciproal
-import com.tangledwebgames.masterofdoors.util.times
 
 object BeatBack : BattleAction {
 
@@ -17,6 +16,8 @@ object BeatBack : BattleAction {
     override val name: String = "Beat Back"
     override val manaCost: Int = 12
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
+
+    val baseDamage: Int = Attack.baseDamage
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return target.isAlive() && !target.isAlly(actor)
@@ -29,12 +30,10 @@ object BeatBack : BattleAction {
             modifier = -5,
             difficulty = target.defense
         )
-        val multiplier = if (isCrit) {
-            2 to 1
-        } else {
-            3 to 2
-        } * actor.damageMultiplier * target.damageResistance.reciproal()
-        val damage = (actor.attack * multiplier - target.defense).coerceAtLeast(0)
+
+        val damage = calculatePhysicalDamage(
+            actor = actor, target = target, baseDamage = baseDamage, isCrit = isCrit
+        )
 
         viewStateChange {
             logMessage = "${actor.name} beats ${target.name} back!"

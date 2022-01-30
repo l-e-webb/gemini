@@ -34,6 +34,7 @@ object Heal : BattleAction {
             viewStateChange {
                 logMessage = "${target.name} was healed by ${actor.healing}!"
                 healingPopup(target.id, actor.healing)
+                statusChange(battlerId = target.id, health = target.health)
                 wait = WAIT_AFTER_DAMAGE_OR_HEALING
             }.also { add(it) }
         }
