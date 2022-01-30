@@ -1,6 +1,7 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
 import com.badlogic.gdx.Gdx
+import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.onTurnStart
 
 data class Battle(
     val playerBattlers: MutableList<Battler> = mutableListOf(),
@@ -67,6 +68,10 @@ data class Battle(
             }
             Phase.PLAYER_TURN_START -> {
                 getCurrentPlayerBattler()?.let {
+                    onPlayerTurnStart(it)
+                    if (checkEndBattle()) {
+                        return
+                    }
                     if (it.canAct()) {
                         updatePhase(Phase.PLAYER_TURN)
                         // Do not advance, wait for action.
@@ -128,7 +133,8 @@ data class Battle(
     }
 
     fun takeEnemyTurn(enemy: Battler) {
-        if (!enemy.canAct()) {
+        onEnemyTurnStart(enemy)
+        if (checkEndBattle() || !enemy.canAct()) {
             return
         }
         determineEnemyAction(
@@ -153,8 +159,8 @@ data class Battle(
             Gdx.app.log(Battle::class.simpleName, "Attempting to invoke action with actor or battlers not in battle.")
             return
         }
-        if (!actor.canAct()) {
-            Gdx.app.log(Battle::class.simpleName, "Attempting to act as ${actor.name}, but cannot act.")
+        if (!action.canExecute(actor)) {
+            Gdx.app.log(Battle::class.simpleName, "Attempting to take action that cannot be executed by this actor.")
             return
         }
         targets.filter { action.isValid(actor, it) }
@@ -174,6 +180,14 @@ data class Battle(
         } else {
             false
         }
+    }
+
+    fun onPlayerTurnStart(battler: Battler) {
+        onTurnStart(battler).forEach { pushBattleEvent(it) }
+    }
+
+    fun onEnemyTurnStart(battler: Battler) {
+        onTurnStart(battler).forEach { pushBattleEvent(it) }
     }
 
     fun addBattleEventListener(listener: (BattleEvent) -> Unit) {

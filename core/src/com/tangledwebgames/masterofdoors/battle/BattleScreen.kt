@@ -3,7 +3,10 @@ package com.tangledwebgames.masterofdoors.battle
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.tangledwebgames.masterofdoors.battle.model.Battle
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BOSS_FORM_ONE_BONUS_HEALTH
 import com.tangledwebgames.masterofdoors.battle.model.Battler
+import com.tangledwebgames.masterofdoors.battle.model.battlers.mage
+import com.tangledwebgames.masterofdoors.battle.model.battlers.paladin
 import ktx.app.clearScreen
 
 class BattleScreen(private val stage: Stage) : ScreenAdapter() {
@@ -18,22 +21,8 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
         battle = Battle()
         presenter = BattlePresenter(view, battle)
         battle.playerBattlers.apply {
-            add(
-                Battler(
-                    id = "p1",
-                    name = "Player 1",
-                    isEnemy = false,
-                    bonusHealth = 50
-                )
-            )
-            add(
-                Battler(
-                    id = "p2",
-                    name = "Player 2",
-                    isEnemy = false,
-                    bonusHealth = 50
-                )
-            )
+            add(paladin())
+            add(mage())
         }
         battle.enemyBattlers.apply {
             add(
@@ -41,7 +30,13 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
                     id = "e1",
                     name = "Enemy 1",
                     isEnemy = true,
-                    bonusHealth = -60
+                    bonusHealth = BOSS_FORM_ONE_BONUS_HEALTH,
+                    physique = 6,
+                    spirit = 6,
+                    power = 6,
+                    finesse = 6,
+                    aggression = 6,
+                    caution = 6
                 )
             )
         }

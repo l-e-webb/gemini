@@ -5,7 +5,7 @@ import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.viewStateChange
 
-class NonAction : BattleAction {
+object NonAction : BattleAction {
     override val id: String = "non-action"
     override val name: String = "No Action"
     override val manaCost: Int = 0

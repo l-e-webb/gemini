@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.delay
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleAction
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AT_START_OF_ENEMY_TURN
 import com.tangledwebgames.masterofdoors.battle.model.BattleEvent
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.actions.Attack
@@ -32,7 +33,7 @@ class BattlePresenter(
                     battleScreenView.enqueueAction(Actions.run { hideMenu() })
                 }
                 if (event.phase == Battle.Phase.ENEMY_TURN) {
-                    battleScreenView.enqueueAction(delay(1f))
+                    battleScreenView.enqueueAction(delay(WAIT_AT_START_OF_ENEMY_TURN))
                 }
                 if (event.phase == Battle.Phase.BATTLE_START) {
                     battleScreenView.clearAllBattlerViews()
@@ -74,13 +75,13 @@ class BattlePresenter(
     fun showActionMenu() {
         battleScreenView.setMenu(
             listOf(
-                BattleMenuItem(Attack.NAME, Attack.ATTACK_ID),
+                BattleMenuItem(Attack.name, Attack.id),
                 BattleMenuItem("Skills", "skill")
             )
         ) {
             when (it) {
-                Attack.ATTACK_ID -> {
-                    pendingAction = Attack.instance
+                Attack.id -> {
+                    pendingAction = Attack
                     showTargetingMenu()
                 }
                 "skill" -> showSkillMenu()
@@ -102,7 +103,7 @@ class BattlePresenter(
         }.let { menuItems ->
             battleScreenView.setMenu(menuItems) { id ->
                 if (id == "back") {
-                    if (pendingAction.id == Attack.ATTACK_ID) {
+                    if (pendingAction.id == Attack.id) {
                         showActionMenu()
                     } else {
                         showSkillMenu()
@@ -134,8 +135,24 @@ class BattlePresenter(
                 playerBattler.skills
                     .first { it.id == id }
                     .let {
-                        pendingAction = it
-                        showTargetingMenu()
+                        when {
+                            it.canExecute(playerBattler) -> {
+                                pendingAction = it
+                                showTargetingMenu()
+                            }
+                            playerBattler.mana < it.manaCost -> {
+                                battleScreenView.showDialog(
+                                    title = "Insufficient mana!",
+                                    buttons = listOf(BattleMenuItem("Continue", ""))
+                                ) {}
+                            }
+                            else -> {
+                                battleScreenView.showDialog(
+                                    title = "You cannot use that skill",
+                                    buttons = listOf(BattleMenuItem("Continue", ""))
+                                ) {}
+                            }
+                        }
                     }
             }
         }

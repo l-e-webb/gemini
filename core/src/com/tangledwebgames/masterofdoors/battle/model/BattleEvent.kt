@@ -96,3 +96,32 @@ class StateChangeBuilder {
 inline fun viewStateChange(
     buildBlock: StateChangeBuilder.() -> Unit
 ): BattleEvent = StateChangeBuilder().apply(buildBlock).build()
+
+fun damageViewStateChange(target: Battler, damage: Int, isCrit: Boolean) = viewStateChange {
+    if (damage == 0) {
+        logMessage = "The attack had no effect on ${target.name}"
+        textPopup(
+            battlerId = target.id,
+            text = "*no effect*"
+        )
+    } else {
+        logMessage = "${target.name} takes $damage damage!"
+        damagePopup(battlerId = target.id, amount = damage)
+        statusChange(battlerId = target.id, health = target.health)
+    }
+    wait = if (isCrit) {
+        BattleConstants.WAIT_AFTER_DAMAGE_BEFORE_CRIT
+    } else {
+        BattleConstants.WAIT_AFTER_DAMAGE_OR_HEALING
+    }
+}
+
+fun critViewStateChange() = viewStateChange {
+    logMessage = "Critical hit!"
+    wait = BattleConstants.WAIT_AFTER_CRIT_DECLARATION
+}
+
+fun targetDiesViewStateChange(target: Battler) = viewStateChange {
+    logMessage = "${target.name} falls!"
+    wait = BattleConstants.WAIT_AFTER_TARGET_DIES_DECLARATION
+}

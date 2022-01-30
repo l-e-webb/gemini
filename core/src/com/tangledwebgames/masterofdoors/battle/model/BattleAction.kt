@@ -17,5 +17,9 @@ interface BattleAction {
         return targets.flatMap { execute(actor, it) }
     }
 
+    fun canExecute(actor: Battler): Boolean {
+        return actor.canAct() && actor.mana >= manaCost
+    }
+
     fun execute(actor: Battler, target: Battler): List<BattleEvent>
 }

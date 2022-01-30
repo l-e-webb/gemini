@@ -2,16 +2,14 @@ package com.tangledwebgames.masterofdoors.battle.model.actions
 
 import com.tangledwebgames.masterofdoors.battle.model.*
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
-import com.tangledwebgames.masterofdoors.battle.model.BattleFunctions.statCheckPassFail
 import com.tangledwebgames.masterofdoors.util.listBuilder
 import com.tangledwebgames.masterofdoors.util.reciproal
 import com.tangledwebgames.masterofdoors.util.times
 
-object Attack : BattleAction {
-
-    override val id: String = "attack"
-    override val name: String = "Attack"
-    override val manaCost: Int = 0
+object EnergyBolt : BattleAction {
+    override val id: String = "energy_bolt"
+    override val name: String = "Energy Bolt"
+    override val manaCost: Int = 15
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
@@ -19,29 +17,20 @@ object Attack : BattleAction {
     }
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> {
-        val isCrit = statCheckPassFail(
-            stat = actor.precision,
-            modifier = -5,
-            difficulty = target.defense
-        )
-        val multiplier = if (isCrit) {
-            3 to 1
-        } else {
-            2 to 1
-        } * actor.damageMultiplier * target.damageResistance.reciproal()
-        val damage = (actor.attack * multiplier - target.defense).coerceAtLeast(0)
+        actor.mana -= manaCost
+        val multiplier = (3 to 1) *
+                actor.damageMultiplier *
+                target.damageResistance.reciproal()
+        val damage = (actor.magicAttack * multiplier - target.defense).coerceAtLeast(0)
         target.health = (target.health - damage).coerceAtLeast(0)
         return listBuilder {
             viewStateChange {
-                logMessage = "${actor.name} attacks!"
+                logMessage = "${actor.name} casts $name!"
                 wait = WAIT_AFTER_ACTION_DECLARATION
-            }.also { add(it) }
-
-            add(damageViewStateChange(target = target, damage = damage, isCrit = isCrit))
-
-            if (isCrit) {
-                add(critViewStateChange())
+                statusChange(battlerId = actor.id, mana = actor.mana)
             }
+
+            add(damageViewStateChange(target = target, damage = damage, isCrit = false))
 
             if (!target.isAlive()) {
                 add(targetDiesViewStateChange(target))
