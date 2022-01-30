@@ -1,221 +1,161 @@
 package com.tangledwebgames.masterofdoors.status
 
-import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.Align
-import com.tangledwebgames.masterofdoors.HIGHLIGHTABLE_BUTTON_STYLE
-import com.tangledwebgames.masterofdoors.STAT_VALUE_LARGE_STYLE
-import com.tangledwebgames.masterofdoors.STAT_VALUE_STYLE
+import com.tangledwebgames.masterofdoors.LABEL_LARGE_STYLE
+import com.tangledwebgames.masterofdoors.UiConstants
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
-import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
-import com.tangledwebgames.masterofdoors.battle.model.BattleAction
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants
 import com.tangledwebgames.masterofdoors.battle.model.Battler
+import com.tangledwebgames.masterofdoors.util.textProperty
+import ktx.actors.onClick
 import ktx.scene2d.*
 import ktx.style.get
 
-fun KTableWidget.statusView(
-    battler: Battler, onSkillSelect: (BattleAction?) -> Unit = {}
-) {
-    clear()
-    pad(PADDING_LARGE)
-    defaults().space(PADDING_LARGE)
+class StatusView(val includeSelectionArrows: Boolean = false) {
+    val rootTable: KTableWidget
+    val battlerStatusTable: KTableWidget
 
-    row()
-    label(battler.name, "title")
+    private val infoLabel: Label = scene2d.label("")
+    var infoText: String by infoLabel.textProperty()
 
-    row()
-    table {
-        defaults().space(PADDING_SMALL)
+    var onLeftSelectionArrowClick: (Int) -> Unit = {}
+    var onRightSelectionArrowClick: (Int) -> Unit = {}
 
-        row()
-        label("Physique") {
-            it.uniformX()
-        }
+    init {
+        rootTable = scene2d.table {
+            defaults().space(PADDING_LARGE)
 
-        actor(Actor())
+            table { infoCell ->
+                infoCell.expandY().bottom()
+                background = skin["panel"]
+                pad(UiConstants.PADDING_SMALL)
+                defaults().space(UiConstants.PADDING_SMALL)
 
-        label("Spirit") {
-            it.uniformX()
-        }
+                row().left()
+                label("Skill Info", "title")
+                row().fill()
+                actor(infoLabel) {
+                    it.width(400f).height(150f)
+                    setAlignment(Align.topLeft)
+                    wrap = true
+                }
+            }
 
-        row()
-        label(battler.physique.toString(), STAT_VALUE_LARGE_STYLE) {
-            it.uniformX()
-        }
-
-        slider(
-            min = 0f,
-            max = 1f,
-            step = 0.01f,
-            style = "stat-slider"
-        ) {
-            width = 150f
-            value = battler.spirit.toFloat() / (battler.physique + battler.spirit)
-            touchable = Touchable.disabled
-        }
-
-        label(battler.spirit.toString(), STAT_VALUE_LARGE_STYLE) {
-            it.uniformX()
-        }
-
-        row().spaceTop(PADDING_LARGE)
-        label("Power") {
-            it.uniformX()
-        }
-
-        actor(Actor())
-
-        label("Finesse") {
-            it.uniformX()
-        }
-
-        row()
-        label(battler.power.toString(), STAT_VALUE_LARGE_STYLE) {
-            it.uniformX()
-        }
-
-        slider(
-            min = 0f,
-            max = 1f,
-            step = 0.01f,
-            style = "stat-slider"
-        ) {
-            width = 150f
-            value = battler.finesse.toFloat() / (battler.power + battler.finesse)
-            touchable = Touchable.disabled
-        }
-
-        label(battler.finesse.toString(), STAT_VALUE_LARGE_STYLE) {
-            it.uniformX()
-        }
-
-        row().spaceTop(PADDING_LARGE)
-        label("Aggression") {
-            it.uniformX()
-        }
-
-        actor(Actor())
-
-        label("Caution") {
-            it.uniformX()
-        }
-
-        row()
-        label(battler.aggression.toString(), STAT_VALUE_LARGE_STYLE)
-
-        slider(
-            min = 0f,
-            max = 1f,
-            step = 0.01f,
-            style = "stat-slider"
-        ) {
-            width = 150f
-            value = battler.caution.toFloat() / (battler.aggression + battler.caution)
-            touchable = Touchable.disabled
-        }
-
-        label(battler.caution.toString(), STAT_VALUE_LARGE_STYLE)
-    }
-
-    row()
-    table {
-        defaults().space(PADDING_LARGE)
-        row()
-        table {
-            defaults().space(PADDING_MEDIUM)
-            columnDefaults(0).left().width(120f)
-            columnDefaults(1).right()
-            row()
-            label("Health")
-            label(battler.maxHealth.toString(), STAT_VALUE_LARGE_STYLE)
+            table {
+                battlerStatusTable = this
+            }
 
             row()
-            label("Attack")
-            label(battler.attack.toString(), STAT_VALUE_LARGE_STYLE)
+            table { keyCell ->
+                keyCell.colspan(2)
+                background = skin["panel"]
+                pad(PADDING_LARGE)
+                defaults().space(UiConstants.PADDING_MEDIUM)
+                label("Key", "title")
 
-            row()
-            label("Defense")
-            label(battler.defense.toString(), STAT_VALUE_LARGE_STYLE)
+                row()
+                table {
+                    defaults()
+                        .spaceTop(UiConstants.PADDING_SMALL)
+                        .spaceBottom(UiConstants.PADDING_SMALL)
+                        .spaceLeft(PADDING_LARGE * 2)
+                        .spaceRight(PADDING_LARGE * 2)
+                        .uniformX()
+                        .left()
 
-            row()
-            label("Precision")
-            label(battler.precision.toString(), STAT_VALUE_LARGE_STYLE)
-        }
+                    row()
+                    label("Health", LABEL_LARGE_STYLE)
+                    label("Attack", LABEL_LARGE_STYLE)
+                    label("Defense", LABEL_LARGE_STYLE)
+                    label("Precision", LABEL_LARGE_STYLE)
 
-        image(drawable = skin["progress-bar-c"]) {
-            it.growY()
-        }
+                    row()
+                    label("${BattleConstants.PLAYER_BONUS_HEALTH} + (Physique + Power + Caution) x 5", "stat-value")
+                    label("Physique + Power + Aggression", "stat-value")
+                    label("Physique + Finesse + Caution", "stat-value")
+                    label("Physique + Finesse + Aggression", "stat-value")
 
-        table {
-            defaults().space(PADDING_MEDIUM)
-            columnDefaults(0).left().width(120f)
-            columnDefaults(1).right()
+                    row().fillX().uniformY().top()
+                    label("Reduced by attacks; if reduced to 0, character falls.") {
+                        wrap = true
+                    }
+                    label("Increases damage dealt by attacks and physical skills.") {
+                        wrap = true
+                    }
+                    label("Decreases damage from all attacks.") {
+                        wrap = true
+                    }
+                    label("Increases crit rate and effectiveness of bonus effects of physical skills.") {
+                        wrap = true
+                    }
 
-            row()
-            label("Mana") { it.left() }
-            label(battler.maxMana.toString(), STAT_VALUE_LARGE_STYLE) { it.right() }
+                    row().spaceTop(PADDING_LARGE)
+                    label("Mana", LABEL_LARGE_STYLE)
+                    label("Magic Attack", LABEL_LARGE_STYLE)
+                    label("Healing", LABEL_LARGE_STYLE)
+                    label("Spellcraft", LABEL_LARGE_STYLE)
 
-            row()
-            label("Magic Attack") { it.left() }
-            label(battler.magicAttack.toString(), STAT_VALUE_LARGE_STYLE) { it.right() }
+                    row()
+                    label("${BattleConstants.PLAYER_BONUS_MANA} + (Spirit + Power + Caution) x 2", "stat-value")
+                    label("Spirit + Power + Aggression", "stat-value")
+                    label("Spirit + Finesse + Caution", "stat-value")
+                    label("Spriit + Finesse + Agression", "stat-value")
 
-            row()
-            label("Spellcraft") { it.left() }
-            label(battler.spellcraft.toString(), STAT_VALUE_LARGE_STYLE) { it.right() }
-
-            row()
-            label("Healing") { it.left() }
-            label(battler.healing.toString(), STAT_VALUE_LARGE_STYLE) { it.right() }
+                    row().fillX().uniformY().top()
+                    label("Resource required to use skills. Regenerates by 25% of max value every turn.") {
+                        wrap = true
+                    }
+                    label("Increases damage dealt by magic skills.") {
+                        wrap = true
+                    }
+                    label("Increases effectiveness of healing skills.") {
+                        wrap = true
+                    }
+                    label("Increases effectiveness of bonus effects of spells.") {
+                        wrap = true
+                    }
+                }
+            }
         }
     }
 
-    row()
-    table { cell ->
-        cell.growX().height(100f).fillY()
-        background = this@statusView.skin["panel"]
-        pad(PADDING_MEDIUM)
-        defaults().space(PADDING_LARGE)
-        val v1: KVerticalGroup
-        val v2: KVerticalGroup
-        container {
-            it.grow()
-            fill().prefWidth(0f).minWidth(0f)
-            v1 = verticalGroup {
-                space(PADDING_SMALL).grow()
-            }
-        }
-        container {
-            it.grow()
-            fill().prefWidth(0f).minWidth(0f)
-            v2 = verticalGroup {
-                space(PADDING_SMALL).grow()
-            }
-        }
-        battler.skills.forEachIndexed { index, action ->
-            if ((index % 2) == 0) {
-                v1
-            } else {
-                v2
-            }.textButton(action.name, HIGHLIGHTABLE_BUTTON_STYLE) {
-                label.setAlignment(Align.left)
-                label(action.manaCost.toString(), STAT_VALUE_STYLE)
-
-                addListener(object : InputListener() {
-                    override fun enter(
-                        event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?
-                    ) {
-                        onSkillSelect(action)
+    fun buildBattlerTable(battlers: List<Battler>) {
+        battlerStatusTable.apply {
+            clear()
+            defaults().space(PADDING_LARGE)
+            row().uniformX().fillX()
+            battlers.forEachIndexed { index, battler ->
+                table {
+                    clear()
+                    defaults().space(PADDING_MEDIUM)
+                    if (includeSelectionArrows) {
+                        textButton("<") {
+                            it.right()
+                            onClick{
+                                onLeftSelectionArrowClick(index)
+                            }
+                        }
+                        textButton(">") {
+                            it.left()
+                            onClick {
+                                onRightSelectionArrowClick(index)
+                            }
+                        }
                     }
 
-                    override fun exit(
-                        event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?
-                    ) {
-                        onSkillSelect(null)
+                    row()
+                    table { cell ->
+                        cell.colspan(2)
+                        battlerStatusView(
+                            battler = battler,
+                            onSkillSelect = {
+                                infoText = it?.infoText() ?: ""
+                            }
+                        )
                     }
-                })
+                }
             }
         }
     }

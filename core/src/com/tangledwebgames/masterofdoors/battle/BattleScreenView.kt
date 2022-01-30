@@ -11,10 +11,9 @@ import com.tangledwebgames.masterofdoors.STAT_VALUE_LARGE_STYLE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_LARGE
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_SMALL
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.skin
-import com.tangledwebgames.masterofdoors.status.statusView
+import com.tangledwebgames.masterofdoors.status.StatusView
 import com.tangledwebgames.masterofdoors.util.textProperty
 import ktx.actors.contains
 import ktx.actors.onClick
@@ -24,7 +23,10 @@ import ktx.style.get
 import kotlin.math.pow
 import kotlin.properties.Delegates
 
-class BattleScreenView(val stage: Stage) {
+class BattleScreenView(
+    val battleScreen: BattleScreen,
+    val stage: Stage
+) {
 
     val sequenceAction = SequenceAction()
 
@@ -119,6 +121,17 @@ class BattleScreenView(val stage: Stage) {
                 button(style = "info-uncheckable") {
                     onClick {
                         onInfoButtonClick()
+                    }
+                }
+            }
+
+            container {
+                pad(PADDING_LARGE)
+                setFillParent(true)
+                top().right()
+                textButton("Return to class select") {
+                    onClick {
+                        battleScreen.returnToClassSelect()
                     }
                 }
             }
@@ -324,144 +337,38 @@ class BattleScreenView(val stage: Stage) {
             padTop(titleLabel.prefHeight + PADDING_MEDIUM)
             defaults().space(PADDING_LARGE)
 
-
-            val infoLabel = scene2d.label("")
-            fun setInfoLabelText(text: String) = infoLabel.setText(text)
-
-            val battlerTable = scene2d.table()
-            fun buildBattlerTable(isPlayer: Boolean) {
-                battlerTable.apply {
-                    clear()
-                    defaults().space(PADDING_LARGE)
-                    battlers.filter { isPlayer != it.isEnemy }
-                        .forEach { battler ->
-                            table {
-                                statusView(
-                                    battler = battler,
-                                    onSkillSelect = {
-                                        setInfoLabelText(it?.infoText() ?: "")
-                                    }
-                                )
-                            }
-                        }
-                }
-            }
+            val statusView = StatusView()
 
             scene2d.table {
                 defaults().space(PADDING_LARGE)
 
-                table { cell ->
-                    cell.top()
-                    defaults().space(PADDING_MEDIUM)
-                    val buttonGroup = ButtonGroup<TextButton>().apply {
-                        setMinCheckCount(1)
-                        setMaxCheckCount(1)
-                    }
-                    textButton("Player", "checkable") {
-                        buttonGroup.add(this)
-                        onClick {
-                            buildBattlerTable(isPlayer = true)
-                        }
-                    }
-                    textButton("Enemy", "checkable") {
-                        buttonGroup.add(this)
-                        onClick {
-                            buildBattlerTable(isPlayer = false)
-                        }
-                    }
-
-                    row()
-                    table { infoCell ->
-                        infoCell.colspan(2)
-                        background = skin["panel"]
-                        pad(PADDING_SMALL)
-                        defaults().space(PADDING_SMALL)
-
-                        row().left()
-                        label("Info", LABEL_LARGE_STYLE)
-                        row().fill()
-                        actor(infoLabel) {
-                            it.width(400f).height(150f)
-                            setAlignment(Align.topLeft)
-                            wrap = true
-                        }
+                row()
+                val buttonGroup = ButtonGroup<TextButton>().apply {
+                    setMinCheckCount(1)
+                    setMaxCheckCount(1)
+                }
+                textButton("Player", "checkable") { cell ->
+                    cell.right()
+                    buttonGroup.add(this)
+                    onClick {
+                        statusView.buildBattlerTable(
+                            battlers = battlers.filter { !it.isEnemy }
+                        )
                     }
                 }
-
-                actor(battlerTable) { cell ->
-                    cell.expandY()
+                textButton("Enemy", "checkable") { cell ->
+                    cell.left()
+                    buttonGroup.add(this)
+                    onClick {
+                        statusView.buildBattlerTable(
+                            battlers = battlers.filter { it.isEnemy }
+                        )
+                    }
                 }
 
                 row()
-                table { cell ->
-                    cell.colspan(2)
-                    background = skin["panel"]
-                    pad(PADDING_LARGE)
-                    defaults().space(PADDING_MEDIUM)
-                    label("Key", "title")
-
-                    row()
-                    table {
-                        defaults()
-                            .spaceTop(PADDING_SMALL)
-                            .spaceBottom(PADDING_SMALL)
-                            .spaceLeft(PADDING_LARGE * 2)
-                            .spaceRight(PADDING_LARGE * 2)
-                            .uniformX()
-                            .left()
-
-                        row()
-                        label("Health", LABEL_LARGE_STYLE)
-                        label("Attack", LABEL_LARGE_STYLE)
-                        label("Defense", LABEL_LARGE_STYLE)
-                        label("Precision", LABEL_LARGE_STYLE)
-
-                        row()
-                        label("${BattleConstants.PLAYER_BONUS_HEALTH} + (Physique + Power + Caution) x 5", "stat-value")
-                        label("Physique + Power + Aggression", "stat-value")
-                        label("Physique + Finesse + Caution", "stat-value")
-                        label("Physique + Finesse + Aggression", "stat-value")
-
-                        row().fillX().uniformY().top()
-                        label("Reduced by attacks; if reduced to 0, character falls.") {
-                            wrap = true
-                        }
-                        label("Increases damage dealt by attacks and physical skills.") {
-                            wrap = true
-                        }
-                        label("Decreases damage from all attacks.") {
-                            wrap = true
-                        }
-                        label("Increases crit rate and effectiveness of bonus effects of physical skills.") {
-                            wrap = true
-                        }
-
-                        row().spaceTop(PADDING_LARGE)
-                        label("Mana", LABEL_LARGE_STYLE)
-                        label("Magic Attack", LABEL_LARGE_STYLE)
-                        label("Healing", LABEL_LARGE_STYLE)
-                        label("Spellcraft", LABEL_LARGE_STYLE)
-
-                        row()
-                        label("${BattleConstants.PLAYER_BONUS_MANA} + (Spirit + Power + Caution) x 2", "stat-value")
-                        label("Spirit + Power + Aggression", "stat-value")
-                        label("Spirit + Finesse + Caution", "stat-value")
-                        label("Spriit + Finesse + Agression", "stat-value")
-
-                        row().fillX().uniformY().top()
-                        label("Resource required to use skills. Regenerates by 25% of max value every turn.") {
-                            wrap = true
-                        }
-                        label("Increases damage dealt by magic skills.") {
-                            wrap = true
-                        }
-                        label("Increases effectiveness of healing skills.") {
-                            wrap = true
-                        }
-                        label("Increases effectiveness of bonus effects of spells.") {
-                            wrap = true
-                        }
-                    }
+                actor(statusView.rootTable) { statusViewCell ->
+                    statusViewCell.grow().colspan(2)
                 }
             }.let {
                 contentTable.add(it)
@@ -469,7 +376,9 @@ class BattleScreenView(val stage: Stage) {
 
             button("Exit")
 
-            buildBattlerTable(true)
+            statusView.buildBattlerTable(
+                battlers = battlers.filter { !it.isEnemy }
+            )
             show(this@BattleScreenView.stage)
         }
     }

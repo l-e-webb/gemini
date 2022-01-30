@@ -3,7 +3,7 @@ package com.tangledwebgames.masterofdoors
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.tangledwebgames.masterofdoors.battle.BattleScreen
+import com.tangledwebgames.masterofdoors.status.ClassSelectScreen
 import ktx.scene2d.Scene2DSkin.defaultSkin
 
 class MasterOfDoorsGame : Game() {
@@ -15,7 +15,7 @@ class MasterOfDoorsGame : Game() {
         stage = Stage().also {
             Gdx.input.inputProcessor = it
         }
-        setScreen(BattleScreen(stage))
+        setScreen(ClassSelectScreen(this))
     }
 
     override fun dispose() {

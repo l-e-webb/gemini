@@ -14,6 +14,7 @@ import com.tangledwebgames.masterofdoors.battle.model.actions.Attack
 import ktx.actors.then
 
 class BattlePresenter(
+    val battleScreen: BattleScreen,
     val battleScreenView: BattleScreenView,
     val battle: Battle
 ) {
@@ -231,18 +232,23 @@ class BattlePresenter(
         }
         val buttons = listOf(
             BattleMenuItem(
-                text = "Play again",
-                id = "play"
+                id = "play",
+                text = "Fight again"
             ),
             BattleMenuItem(
-                text = "Quit",
-                id = "quit"
+                id = "class_select",
+                text = "Return to class select"
+            ),
+            BattleMenuItem(
+                id = "quit",
+                text = "Quit"
             )
         )
 
         battleScreenView.showDialog(title = title, buttons = buttons) {
             when (it) {
                 "play" -> battle.begin()
+                "class_select" -> battleScreen.returnToClassSelect()
                 "quit" -> Gdx.app.exit()
             }
         }

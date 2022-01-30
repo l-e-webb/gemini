@@ -2,14 +2,22 @@ package com.tangledwebgames.masterofdoors.battle
 
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.tangledwebgames.masterofdoors.MasterOfDoorsGame
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BOSS_FORM_ONE_BONUS_HEALTH
 import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.battlers.paladin
 import com.tangledwebgames.masterofdoors.battle.model.battlers.rogue
+import com.tangledwebgames.masterofdoors.status.ClassSelectScreen
 import ktx.app.clearScreen
 
-class BattleScreen(private val stage: Stage) : ScreenAdapter() {
+class BattleScreen(
+    private val game: MasterOfDoorsGame,
+    private val playerClasses: List<Battler>
+) : ScreenAdapter() {
+
+    private val stage: Stage
+        get() = game.stage
 
     private lateinit var view: BattleScreenView
     private lateinit var presenter: BattlePresenter
@@ -17,9 +25,9 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
 
     override fun show() {
         stage.clear()
-        view = BattleScreenView(stage)
+        view = BattleScreenView(this, stage)
         battle = Battle()
-        presenter = BattlePresenter(view, battle)
+        presenter = BattlePresenter(this, view, battle)
         battle.playerBattlers.apply {
             add(paladin())
             add(rogue())
@@ -41,6 +49,10 @@ class BattleScreen(private val stage: Stage) : ScreenAdapter() {
             )
         }
         battle.begin()
+    }
+
+    fun returnToClassSelect() {
+        game.screen = ClassSelectScreen(game)
     }
 
     override fun render(delta: Float) {
