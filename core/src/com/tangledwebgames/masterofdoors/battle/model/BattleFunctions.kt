@@ -1,11 +1,12 @@
 package com.tangledwebgames.masterofdoors.battle.model
 
 import com.badlogic.gdx.Gdx
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.ATTACK_DEFENSE_RATIO_EXPONENT
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MANA_REGEN_RATIO
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
-import com.tangledwebgames.masterofdoors.util.listBuilder
 import com.tangledwebgames.masterofdoors.util.reciproal
 import com.tangledwebgames.masterofdoors.util.times
+import kotlin.math.pow
 import kotlin.random.Random
 
 object BattleFunctions {
@@ -16,7 +17,10 @@ object BattleFunctions {
         baseDamage: Int,
         attackDamageMultiplier: Pair<Int, Int>,
         defenseDamageMultiplier: Pair<Int, Int>,
-    ): Int = Pair(attack, defense)
+    ): Int = Pair(
+        attackDefenseExponentiation(attack),
+        attackDefenseExponentiation(defense)
+    )
         .times(attackDamageMultiplier)
         .times(defenseDamageMultiplier.reciproal())
         .times(baseDamage)
@@ -69,9 +73,21 @@ object BattleFunctions {
         }
     }
 
-    fun onTurnStart(battler: Battler): List<BattleEvent> = listBuilder {
+    fun onTurnStart(battler: Battler): List<BattleEvent> {
+        if (!battler.isAlive()) {
+            battler.statusEffects.clear()
+            viewStateChange {
+                statusChange(
+                    battlerId = battler.id,
+                    statusEffects = battler.statusEffects.deepCopy()
+                )
+            }.let {
+                return listOf(it)
+            }
+        }
+
         if (!battler.isEnemy) {
-            battler.mana = (battler.mana + battler.maxMana / MANA_REGEN_RATIO).coerceIn(0, battler.maxMana)
+            battler.mana = (battler.mana + (battler.maxMana * MANA_REGEN_RATIO)).coerceIn(0, battler.maxMana)
         }
 
         val healthChange: Int = battler.statusEffects.sumOf {
@@ -126,4 +142,10 @@ object BattleFunctions {
             )
         }.let { listOf(it) }
     }
+
+    fun attackDefenseExponentiation(value: Int) = value
+        .toFloat()
+        .times(100)
+        .pow(ATTACK_DEFENSE_RATIO_EXPONENT)
+        .toInt()
 }

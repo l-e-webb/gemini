@@ -6,7 +6,7 @@ import com.tangledwebgames.masterofdoors.util.listBuilder
 object SunderArmor : BattleAction {
     override val id: String = "sunder_armor"
     override val name: String = "Sunder Armor"
-    override val manaCost: Int = 15
+    override val manaCost: Int = 18
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String = """
         Weak physical attack which makes the target more vulnerable to damage. Severity and duration of debuff depend on Precision vs Defense check.

@@ -13,7 +13,7 @@ object Stealth : BattleAction {
 
     override val id: String = "stealth"
     override val name: String = "Stealth"
-    override val manaCost: Int = 12
+    override val manaCost: Int = 15
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """

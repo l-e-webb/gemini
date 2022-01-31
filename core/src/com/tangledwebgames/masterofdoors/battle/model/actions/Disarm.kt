@@ -7,7 +7,7 @@ object Disarm : BattleAction {
 
     override val id: String = "disarm"
     override val name: String = "Disarm"
-    override val manaCost: Int = 15
+    override val manaCost: Int = 18
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """

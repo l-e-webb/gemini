@@ -14,7 +14,7 @@ object Guard : BattleAction {
 
     override val id: String = "guard"
     override val name: String = "Guard"
-    override val manaCost: Int = 8
+    override val manaCost: Int = 12
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """

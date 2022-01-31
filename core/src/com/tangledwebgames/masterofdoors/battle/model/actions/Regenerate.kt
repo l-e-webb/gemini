@@ -8,7 +8,7 @@ import com.tangledwebgames.masterofdoors.util.listBuilder
 object Regenerate : BattleAction {
     override val id: String = "regenerate"
     override val name: String = "Regenerate"
-    override val manaCost: Int = 18
+    override val manaCost: Int = 15
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
@@ -19,7 +19,7 @@ object Regenerate : BattleAction {
     val baseHealing = 10
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
-        return target.isAlive() && !target.isAffectedBy(BattleConstants.REGEN_ID)
+        return target.isAlive() && target.isAlly(actor) && !target.isAffectedBy(BattleConstants.REGEN_ID)
     }
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> {

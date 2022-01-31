@@ -8,7 +8,7 @@ import com.tangledwebgames.masterofdoors.util.listBuilder
 object EnergyBolt : BattleAction {
     override val id: String = "energy_bolt"
     override val name: String = "Energy Bolt"
-    override val manaCost: Int = 15
+    override val manaCost: Int = 18
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """

@@ -7,7 +7,7 @@ object CrushingBlow : BattleAction {
 
     override val id: String = "crushing_blow"
     override val name: String = "Crushing Blow"
-    override val manaCost: Int = 12
+    override val manaCost: Int = 20
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
@@ -15,16 +15,17 @@ object CrushingBlow : BattleAction {
             Base power: $baseDamage + Physique
         """.trimIndent()
 
-    val baseDamage: Int = 30
+    val baseDamage: Int = 28
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return target.isAlive() && !target.isAlly(actor)
     }
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> {
+        actor.mana -= manaCost
         val isCrit = BattleFunctions.statCheckPassFail(
             stat = actor.precision,
-            modifier = -8,
+            modifier = -9,
             difficulty = target.defense
         )
         val damage = BattleFunctions.calculatePhysicalDamage(

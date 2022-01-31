@@ -14,10 +14,10 @@ object ConjureArmor : BattleAction {
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
-            Summon magical armor to reduce incoming damage to one ally by 33% for 3 turns. Cannot stack with other defense buffs.
+            Summon magical armor to reduce incoming damage to one ally by 50% for 3 turns. Cannot stack with other defense buffs.
         """.trimIndent()
 
-    val damageReduction = 4 to 3
+    val damageReduction = 3 to 2
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return target.isAlive() && target.isAlly(actor) && !target.isAffectedBy(INCOMING_DAMAGE_DOWN_ID)
@@ -27,7 +27,7 @@ object ConjureArmor : BattleAction {
         actor.mana -= manaCost
         target.addStatusEffect(
             id = INCOMING_DAMAGE_DOWN_ID,
-            name = "Damage Reduction 33%",
+            name = "Damage Reduction 50%",
             duration = 3,
             statSet = StatSet(
                 damageResistance = damageReduction

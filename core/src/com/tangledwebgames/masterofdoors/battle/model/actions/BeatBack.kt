@@ -15,7 +15,7 @@ object BeatBack : BattleAction {
 
     override val id: String = "beat_back"
     override val name: String = "Beat Back"
-    override val manaCost: Int = 15
+    override val manaCost: Int = 20
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """

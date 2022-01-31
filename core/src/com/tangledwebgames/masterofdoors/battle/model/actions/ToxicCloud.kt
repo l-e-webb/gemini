@@ -6,7 +6,7 @@ import com.tangledwebgames.masterofdoors.util.listBuilder
 object ToxicCloud : BattleAction {
     override val id: String = "toxic_cloud"
     override val name: String = "Toxic Cloud"
-    override val manaCost: Int = 15
+    override val manaCost: Int = 18
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """

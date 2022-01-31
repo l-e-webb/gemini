@@ -13,7 +13,7 @@ fun attackGeminusPhys(): Battler = Battler(
     finesse = 3,
     aggression = 7,
     caution = 3,
-    bonusHealth = 210,
+    bonusHealth = 265,
     skills = mutableListOf(
         CrushingBlow,
         Fury,
@@ -32,7 +32,7 @@ fun attackGeminusMag(): Battler = Battler(
     finesse = 3,
     aggression = 7,
     caution = 3,
-    bonusHealth = 245,
+    bonusHealth = 285,
     skills = mutableListOf(
         EnergyBolt,
         AcidRain,
@@ -51,11 +51,29 @@ fun supportGeminus(): Battler = Battler(
     finesse = 7,
     aggression = 3,
     caution = 7,
-    bonusHealth = 180,
+    bonusHealth = 235,
     skills = mutableListOf(
         EnergyBolt,
         ConjureArmor,
         PowerSurge,
-        Cure,
+        Dispel,
+    )
+)
+
+fun revengeGeminus(): Battler = Battler(
+    id = "revenge_geminus",
+    name = "Revenge Geminus",
+    isEnemy = true,
+    physique = 7,
+    spirit = 7,
+    power = 7,
+    finesse = 3,
+    aggression = 8,
+    caution = 2,
+    bonusHealth = 270,
+    skills = mutableListOf(
+        EnergyBolt,
+        VenomedEdge,
+        Fury
     )
 )

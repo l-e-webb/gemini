@@ -58,6 +58,7 @@ data class Battle(
                 advance()
             }
             Phase.ROUND_START -> {
+                round++
                 pushStateChange {
                     logMessage = "Begin round $round"
                     wait = 0.5f
@@ -106,7 +107,6 @@ data class Battle(
                 advance()
             }
             Phase.ROUND_END -> {
-                round++
                 updatePhase(Phase.ROUND_START)
                 advance()
             }
