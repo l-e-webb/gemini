@@ -19,7 +19,7 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = "master-of-doors"
+        appName = "gemini"
         gdxVersion = '1.10.0'
         ktxVersion = '1.10.0-rc1'
         roboVMVersion = '2.3.12'

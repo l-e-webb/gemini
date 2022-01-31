@@ -15,6 +15,7 @@ class MasterOfDoorsGame : Game() {
         stage = Stage().also {
             Gdx.input.inputProcessor = it
         }
+        Gdx.graphics.setTitle("Gemini")
         setScreen(ClassSelectScreen(this))
     }
 
