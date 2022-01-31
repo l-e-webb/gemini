@@ -3,6 +3,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../core/assets"]
 
 project.ext.mainClassName = "com.tangledwebgames.masterofdoors.desktop.DesktopLauncher"
+project.getConvention().getPlugin(ApplicationPluginConvention.class).setMainClassName(project.mainClassName)
 project.ext.assetsDir = new File("../core/assets")
 
 compileKotlin {
@@ -11,7 +12,7 @@ compileKotlin {
     }
 }
 
-task run(dependsOn: classes, type: JavaExec) {
+task runGdx(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -39,7 +40,26 @@ task dist(type: Jar) {
     with jar
 }
 
-
 dist.dependsOn classes
 
-eclipse.project.name = appName + "-desktop"
+parcl {
+    exe {
+        exeName = "gemini"
+        vmArgs = ["-Xms128m", "-Xmx1500m"]
+    }
+
+    app {
+        appName = "Gemini"
+        icon = "extra/controller.icns"
+        displayName = "My Application"
+        applicationCategory = "public.app-category.role-playing-game"
+        identifier = "com.tangledwebgames.masterofdoors"
+        copyright = "Made 2022 by Tangled Web Games LLC; distributed under  CC BY-NC-SA 3.0 license (Attribution-NonComertial-ShareAlike)"
+        vmArgs = ["-Xms128m", "-Xmx1500m"]
+    }
+
+    linux {
+        binName = "myapplication"
+        vmArgs = ["-Xms128m", "-Xmx1500m"]
+    }
+}

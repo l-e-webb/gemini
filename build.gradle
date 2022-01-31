@@ -10,6 +10,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath 'org.mini2Dx:parcl:1.8.0'
 
     }
 }
@@ -41,7 +42,8 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "kotlin"
-
+    apply plugin: "application"
+    apply plugin: "org.mini2Dx.parcl"
 
     dependencies {
         implementation project(":core")
