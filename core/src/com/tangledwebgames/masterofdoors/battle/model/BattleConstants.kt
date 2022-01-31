@@ -7,6 +7,10 @@ object BattleConstants {
 
     const val POISON_ID = "poison"
     const val INCOMING_DAMAGE_UP_ID = "incoming_damage_up"
+    const val DAMAGE_DOWN_ID = "damage_down"
+    const val DAMAGE_UP_ID = "damage_up"
+    const val REGEN_ID = "regen"
+    const val INCOMING_DAMAGE_DOWN_ID = "incoming_damage_down"
 
     const val MANA_REGEN_RATIO = 25
     const val PLAYER_BONUS_HEALTH = 50

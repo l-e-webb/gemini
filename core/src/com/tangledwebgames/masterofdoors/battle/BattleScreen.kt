@@ -6,8 +6,6 @@ import com.tangledwebgames.masterofdoors.MasterOfDoorsGame
 import com.tangledwebgames.masterofdoors.battle.model.Battle
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BOSS_FORM_ONE_BONUS_HEALTH
 import com.tangledwebgames.masterofdoors.battle.model.Battler
-import com.tangledwebgames.masterofdoors.battle.model.battlers.paladin
-import com.tangledwebgames.masterofdoors.battle.model.battlers.rogue
 import com.tangledwebgames.masterofdoors.status.ClassSelectScreen
 import ktx.app.clearScreen
 
@@ -26,12 +24,10 @@ class BattleScreen(
     override fun show() {
         stage.clear()
         view = BattleScreenView(this, stage)
-        battle = Battle()
+        battle = Battle(
+            playerBattlers = playerClasses.toMutableList()
+        )
         presenter = BattlePresenter(this, view, battle)
-        battle.playerBattlers.apply {
-            add(paladin())
-            add(rogue())
-        }
         battle.enemyBattlers.apply {
             add(
                 Battler(

@@ -1,21 +1,20 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
 import com.tangledwebgames.masterofdoors.battle.model.*
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
 import com.tangledwebgames.masterofdoors.util.listBuilder
 
-object Heal : BattleAction {
-    override val id: String = "heal"
-    override val name: String = "Heal"
-    override val manaCost: Int = 12
+object FirstAid : BattleAction {
+    override val id: String = "first_aid"
+    override val name: String = "First Aid"
+    override val manaCost: Int = 8
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
-            Restores Health to one ally.
-            Base healing: 20
+            Weak but universally usable healing skill. Restores Health to one ally.
+            Base power: 12
         """.trimIndent()
 
-    val baseHealing = 20
+    val baseHealing = 12
 
     override fun isValid(actor: Battler, target: Battler): Boolean {
         return target.isAlly(actor) &&
@@ -31,7 +30,7 @@ object Heal : BattleAction {
         return listBuilder {
             viewStateChange {
                 logMessage = "${actor.name} casts $name."
-                wait = WAIT_AFTER_ACTION_DECLARATION
+                wait = BattleConstants.WAIT_AFTER_ACTION_DECLARATION
                 statusChange(battlerId = actor.id, mana = actor.mana)
             }.also { add(it) }
 

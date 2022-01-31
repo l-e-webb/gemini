@@ -3,7 +3,7 @@ package com.tangledwebgames.masterofdoors.status
 import com.badlogic.gdx.ScreenAdapter
 import com.tangledwebgames.masterofdoors.MasterOfDoorsGame
 import com.tangledwebgames.masterofdoors.battle.BattleScreen
-import com.tangledwebgames.masterofdoors.battle.model.battlers.getPlayerClasses
+import com.tangledwebgames.masterofdoors.battle.model.battlers.battlerClasses
 import ktx.app.clearScreen
 
 class ClassSelectScreen(
@@ -19,7 +19,7 @@ class ClassSelectScreen(
         stage.clear()
         view = ClassSelectView(
             stage = stage,
-            playerClasses = getPlayerClasses(),
+            playerClasses = battlerClasses(),
             initialSelectionOne = 0,
             initialSelectionTwo = 1
         )

@@ -12,7 +12,7 @@ object EnergyBolt : BattleAction {
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
-            Basic magic attack, deals damage to one target.
+            Powerful magic attack.
             Base power: $baseDamage
         """.trimIndent()
     val baseDamage: Int = 40
