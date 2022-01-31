@@ -17,7 +17,8 @@ data class Battler(
     var aggression: Int = 5,
     var caution: Int = 5,
     val statusEffects: MutableList<StatusEffect> = mutableListOf(),
-    val skills: MutableList<BattleAction> = mutableListOf()
+    val skills: MutableList<BattleAction> = mutableListOf(),
+    val variables: MutableMap<String, String> = mutableMapOf()
 ) {
     val maxHealth: Int
         get() = bonusHealth + (physique + power + caution) * 5

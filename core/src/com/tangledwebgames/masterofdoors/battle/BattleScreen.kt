@@ -4,8 +4,9 @@ import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.tangledwebgames.masterofdoors.MasterOfDoorsGame
 import com.tangledwebgames.masterofdoors.battle.model.Battle
-import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BOSS_FORM_ONE_BONUS_HEALTH
 import com.tangledwebgames.masterofdoors.battle.model.Battler
+import com.tangledwebgames.masterofdoors.battle.model.battlers.attackGeminusPhys
+import com.tangledwebgames.masterofdoors.battle.model.battlers.supportGeminus
 import com.tangledwebgames.masterofdoors.status.ClassSelectScreen
 import ktx.app.clearScreen
 
@@ -29,20 +30,8 @@ class BattleScreen(
         )
         presenter = BattlePresenter(this, view, battle)
         battle.enemyBattlers.apply {
-            add(
-                Battler(
-                    id = "e1",
-                    name = "Enemy 1",
-                    isEnemy = true,
-                    bonusHealth = BOSS_FORM_ONE_BONUS_HEALTH,
-                    physique = 6,
-                    spirit = 6,
-                    power = 6,
-                    finesse = 6,
-                    aggression = 6,
-                    caution = 6
-                )
-            )
+            add(attackGeminusPhys())
+            add(supportGeminus())
         }
         battle.begin()
     }
