@@ -30,6 +30,12 @@ object BeatBack : BattleAction {
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> = listBuilder {
         actor.mana -= manaCost
+        viewStateChange {
+            logMessage = "${actor.name} beats ${target.name} back!"
+            wait = WAIT_AFTER_ACTION_DECLARATION
+            statusChange(battlerId = actor.id, mana = actor.mana)
+        }.also { add(it) }
+
         val isCrit = statCheckPassFail(
             stat = actor.precision,
             modifier = -5,
@@ -39,12 +45,7 @@ object BeatBack : BattleAction {
         val damage = calculatePhysicalDamage(
             actor = actor, target = target, baseDamage = baseDamage, isCrit = isCrit
         )
-
-        viewStateChange {
-            logMessage = "${actor.name} beats ${target.name} back!"
-            wait = WAIT_AFTER_ACTION_DECLARATION
-            statusChange(battlerId = actor.id, mana = actor.mana)
-        }.also { add(it) }
+        target.health = (target.health - damage).coerceAtLeast(0)
 
         add(damageViewStateChange(target = target, damage = damage, isCrit = isCrit))
 

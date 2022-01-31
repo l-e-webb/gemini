@@ -1,6 +1,8 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
 import com.tangledwebgames.masterofdoors.battle.model.*
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.HEALING_FLASH_COLOR
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
 import com.tangledwebgames.masterofdoors.util.listBuilder
 
 object Regenerate : BattleAction {
@@ -38,10 +40,15 @@ object Regenerate : BattleAction {
                     battlerId = actor.id,
                     mana = actor.mana
                 )
+            }.also { add(it) }
+
+            viewStateChange {
+                flash(battlerId = target.id, color = HEALING_FLASH_COLOR)
                 statusChange(
                     battlerId = target.id,
-                    statusEffects = actor.statusEffects.deepCopy()
+                    statusEffects = target.statusEffects.deepCopy()
                 )
+                wait = MEDIUM_BATTLE_WAIT
             }.also { add(it) }
         }
     }

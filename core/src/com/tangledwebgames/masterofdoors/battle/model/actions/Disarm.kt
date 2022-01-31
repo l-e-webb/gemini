@@ -22,6 +22,13 @@ object Disarm : BattleAction {
 
     override fun execute(actor: Battler, target: Battler): List<BattleEvent> = listBuilder {
         actor.mana -= manaCost
+        viewStateChange {
+            logMessage = "${actor.name} attempts to disarm ${target.name}!"
+            wait = BattleConstants.WAIT_AFTER_ACTION_DECLARATION
+            statusChange(battlerId = actor.id, mana = actor.mana)
+        }.also { add(it) }
+
+
         val isCrit = BattleFunctions.statCheckPassFail(
             stat = actor.precision,
             modifier = -5,
@@ -31,12 +38,7 @@ object Disarm : BattleAction {
         val damage = BattleFunctions.calculatePhysicalDamage(
             actor = actor, target = target, baseDamage = baseDamage, isCrit = isCrit
         )
-
-        viewStateChange {
-            logMessage = "${actor.name} attempts to disarm ${target.name}!"
-            wait = BattleConstants.WAIT_AFTER_ACTION_DECLARATION
-            statusChange(battlerId = actor.id, mana = actor.mana)
-        }.also { add(it) }
+        target.health = (target.health - damage).coerceAtLeast(0)
 
         add(damageViewStateChange(target = target, damage = damage, isCrit = isCrit))
 

@@ -35,6 +35,8 @@ object AcidRain : BattleAction {
         val damage = calculateMagicDamage(
             actor = actor, target = target, baseDamage = baseDamage
         )
+        target.health = (target.health - damage).coerceAtLeast(0)
+
         add(damageViewStateChange(target = target, damage = damage, isCrit = false))
 
         if (!target.isAlive()) {

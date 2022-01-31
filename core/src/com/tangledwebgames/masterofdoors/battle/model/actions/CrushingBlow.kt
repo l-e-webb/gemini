@@ -34,9 +34,10 @@ object CrushingBlow : BattleAction {
             isCrit = isCrit
         )
         target.health = (target.health - damage).coerceAtLeast(0)
+
         return listBuilder {
             viewStateChange {
-                logMessage = "${actor.name} attacks!"
+                logMessage = "${actor.name} attacks with crushing force!"
                 statusChange(
                     battlerId = actor.id,
                     mana = actor.mana

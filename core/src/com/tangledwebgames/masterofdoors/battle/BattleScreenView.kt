@@ -82,7 +82,7 @@ class BattleScreenView(
                 defaults().space(PADDING_MEDIUM)
                 bottom().left()
                 container(KVerticalGroup()) {
-                    it.width(300f).fillX().left()
+                    it.width(400f).fillX().left()
                     background = this@table.skin["panel"]
                     fillX().pad(PADDING_MEDIUM)
                     actor.apply {

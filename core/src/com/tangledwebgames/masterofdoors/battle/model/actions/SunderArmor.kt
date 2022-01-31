@@ -36,7 +36,10 @@ object SunderArmor : BattleAction {
         val damage = BattleFunctions.calculatePhysicalDamage(
             actor = actor, target = target, baseDamage = baseDamage, isCrit = isCrit
         )
+        target.health = (target.health - damage).coerceAtLeast(0)
+
         add(damageViewStateChange(target = target, damage = damage, isCrit = false))
+
         if (isCrit) {
             add(critViewStateChange())
         }

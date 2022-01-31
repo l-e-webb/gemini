@@ -1,6 +1,8 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
 import com.tangledwebgames.masterofdoors.battle.model.*
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.HEALING_FLASH_COLOR
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.REGEN_ID
 import com.tangledwebgames.masterofdoors.util.listBuilder
 
@@ -37,9 +39,17 @@ object SecondWind : BattleAction {
                 wait = BattleConstants.WAIT_AFTER_ACTION_DECLARATION
                 statusChange(
                     battlerId = actor.id,
-                    mana = actor.mana,
+                    mana = actor.mana
+                )
+            }.also { add(it) }
+
+            viewStateChange {
+                flash(battlerId = target.id, color = HEALING_FLASH_COLOR)
+                statusChange(
+                    battlerId = actor.id,
                     statusEffects = actor.statusEffects.deepCopy()
                 )
+                wait = MEDIUM_BATTLE_WAIT
             }.also { add(it) }
         }
     }

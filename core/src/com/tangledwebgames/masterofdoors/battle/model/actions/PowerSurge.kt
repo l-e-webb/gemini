@@ -1,8 +1,11 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
 import com.tangledwebgames.masterofdoors.battle.model.*
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BUFF_FLASH_COLOR
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.DAMAGE_UP_ID
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
+import com.tangledwebgames.masterofdoors.util.listBuilder
 
 object PowerSurge : BattleAction {
     override val id: String = "power_surge"
@@ -45,17 +48,24 @@ object PowerSurge : BattleAction {
             )
         )
 
-        return viewStateChange {
-            logMessage = "${actor.name} casts $name!"
-            statusChange(
-                battlerId = actor.id,
-                mana = actor.mana
-            )
-            statusChange(
-                battlerId = target.id,
-                statusEffects = target.statusEffects.deepCopy()
-            )
-            wait = MEDIUM_BATTLE_WAIT
-        }.let { listOf(it) }
+        return listBuilder {
+            viewStateChange {
+                logMessage = "${actor.name} casts $name!"
+                statusChange(
+                    battlerId = actor.id,
+                    mana = actor.mana
+                )
+                WAIT_AFTER_ACTION_DECLARATION
+            }.also { add(it) }
+
+            viewStateChange {
+                flash(battlerId = target.id, color = BUFF_FLASH_COLOR)
+                statusChange(
+                    battlerId = target.id,
+                    statusEffects = target.statusEffects.deepCopy()
+                )
+                wait = MEDIUM_BATTLE_WAIT
+            }.also { add(it) }
+        }
     }
 }

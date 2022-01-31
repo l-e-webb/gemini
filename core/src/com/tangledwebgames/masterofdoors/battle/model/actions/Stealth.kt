@@ -1,7 +1,10 @@
 package com.tangledwebgames.masterofdoors.battle.model.actions
 
 import com.tangledwebgames.masterofdoors.battle.model.*
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.BUFF_FLASH_COLOR
 import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.MEDIUM_BATTLE_WAIT
+import com.tangledwebgames.masterofdoors.battle.model.BattleConstants.WAIT_AFTER_ACTION_DECLARATION
+import com.tangledwebgames.masterofdoors.util.listBuilder
 
 object Stealth : BattleAction {
 
@@ -42,14 +45,24 @@ object Stealth : BattleAction {
             )
         )
 
-        return viewStateChange {
-            logMessage = "${actor.name} hid in the shadows."
-            statusChange(
-                battlerId = actor.id,
-                mana = actor.mana,
-                statusEffects = actor.statusEffects.deepCopy()
-            )
-            wait = MEDIUM_BATTLE_WAIT
-        }.let { listOf(it) }
+        return listBuilder {
+            viewStateChange {
+                logMessage = "${actor.name} hid in the shadows."
+                statusChange(
+                    battlerId = actor.id,
+                    mana = actor.mana
+                )
+                wait = WAIT_AFTER_ACTION_DECLARATION
+            }.also { add(it) }
+
+            viewStateChange {
+                flash(battlerId = actor.id, color = BUFF_FLASH_COLOR)
+                statusChange(
+                    battlerId = actor.id,
+                    statusEffects = actor.statusEffects.deepCopy()
+                )
+                wait = MEDIUM_BATTLE_WAIT
+            }.also { add(it) }
+        }
     }
 }

@@ -16,13 +16,12 @@ object BattleConstants {
     const val PLAYER_BONUS_HEALTH = 50
     const val PLAYER_BONUS_MANA = 20
 
-    const val BOSS_FORM_ONE_BONUS_HEALTH = 400
-
     const val TINT_FADE_TIME = 0.1f
     const val EFFECT_FLASH_TIME = 0.25f
     val DAMAGE_FLASH_COLOR = Color.RED.cpy().apply { a = 0.5f }
     val HEALING_FLASH_COLOR = HEALTH_BAR_COLOR.cpy().apply { a = 0.5f }
     val HIGHLIGHTED_BATTLER_COLOR = Color.WHITE.cpy().apply { a = 0.2f }
+    val BUFF_FLASH_COLOR = Color.TEAL.cpy().apply { a = 0.5f }
 
     const val LONG_BATTLE_WAIT = 1f
     const val MEDIUM_BATTLE_WAIT = 0.75f
