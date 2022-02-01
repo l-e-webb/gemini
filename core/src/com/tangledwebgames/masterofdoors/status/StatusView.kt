@@ -101,7 +101,7 @@ class StatusView(val includeSelectionArrows: Boolean = false) {
                     label("${BattleConstants.PLAYER_BONUS_MANA} + (Spirit + Power + Caution) x 2", "stat-value")
                     label("Spirit + Power + Aggression", "stat-value")
                     label("Spirit + Finesse + Caution", "stat-value")
-                    label("Spriit + Finesse + Agression", "stat-value")
+                    label("Spirit + Finesse + Aggression", "stat-value")
 
                     row().fillX().uniformY().top()
                     label("Resource required to use skills. Regenerates by 20% of max value every turn.") {

@@ -7,7 +7,7 @@ import com.tangledwebgames.masterofdoors.battle.model.Battler
 import com.tangledwebgames.masterofdoors.battle.model.actions.*
 
 fun battlerClasses() = listOf(
-    warrior(), mage(), rogue(), paladin(), acolyte(), plagueDoctor()
+    warrior(), acolyte(), mage(), rogue(), paladin(), plagueDoctor()
 )
 
 fun warrior(): Battler = Battler(
@@ -41,8 +41,8 @@ fun paladin(): Battler = Battler(
     finesse = 5,
     aggression = 3,
     caution = 7,
-    bonusHealth = BattleConstants.PLAYER_BONUS_HEALTH,
-    bonusMana = BattleConstants.PLAYER_BONUS_MANA,
+    bonusHealth = PLAYER_BONUS_HEALTH,
+    bonusMana = PLAYER_BONUS_MANA,
     skills = mutableListOf(
         BeatBack,
         Heal,
@@ -62,8 +62,8 @@ fun rogue(): Battler = Battler(
     finesse = 8,
     aggression = 9,
     caution = 1,
-    bonusHealth = BattleConstants.PLAYER_BONUS_HEALTH,
-    bonusMana = BattleConstants.PLAYER_BONUS_MANA,
+    bonusHealth = PLAYER_BONUS_HEALTH,
+    bonusMana = PLAYER_BONUS_MANA,
     skills = mutableListOf(
         VenomedEdge,
         SunderArmor,
@@ -83,8 +83,8 @@ fun mage(): Battler = Battler(
     finesse = 5,
     aggression = 6,
     caution = 4,
-    bonusHealth = BattleConstants.PLAYER_BONUS_HEALTH,
-    bonusMana = BattleConstants.PLAYER_BONUS_MANA,
+    bonusHealth = PLAYER_BONUS_HEALTH,
+    bonusMana = PLAYER_BONUS_MANA,
     skills = mutableListOf(
         EnergyBolt,
         ConjureArmor,
@@ -104,8 +104,8 @@ fun acolyte(): Battler = Battler(
     finesse = 6,
     aggression = 1,
     caution = 9,
-    bonusHealth = BattleConstants.PLAYER_BONUS_HEALTH,
-    bonusMana = BattleConstants.PLAYER_BONUS_MANA,
+    bonusHealth = PLAYER_BONUS_HEALTH,
+    bonusMana = PLAYER_BONUS_MANA,
     skills = mutableListOf(
         Cure,
         Heal,
@@ -125,8 +125,8 @@ fun plagueDoctor(): Battler = Battler(
     finesse = 8,
     aggression = 5,
     caution = 5,
-    bonusHealth = BattleConstants.PLAYER_BONUS_HEALTH,
-    bonusMana = BattleConstants.PLAYER_BONUS_MANA,
+    bonusHealth = PLAYER_BONUS_HEALTH,
+    bonusMana = PLAYER_BONUS_MANA,
     skills = mutableListOf(
         AcidRain,
         ToxicCloud,
