@@ -161,13 +161,13 @@ class BattlePresenter(
                             playerBattler.mana < it.manaCost -> {
                                 battleScreenView.showDialog(
                                     title = "Insufficient mana!",
-                                    buttons = listOf(BattleMenuItem("Continue", ""))
+                                    buttons = listOf(BattleMenuItem("", "Continue"))
                                 ) {}
                             }
                             else -> {
                                 battleScreenView.showDialog(
                                     title = "You cannot use that skill",
-                                    buttons = listOf(BattleMenuItem("Continue", ""))
+                                    buttons = listOf(BattleMenuItem("", "Continue"))
                                 ) {}
                             }
                         }

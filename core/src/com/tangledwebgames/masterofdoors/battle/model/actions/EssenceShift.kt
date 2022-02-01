@@ -62,8 +62,10 @@ object EssenceShift : BattleAction {
 
         val effectsToSteal = target.statusEffects
             .filter { it.id in positiveEffectsStolen }
+            .toMutableList()
         val effectsToTransfer = actor.statusEffects
             .filter { it.id in negativeEffectsTransferred }
+            .toMutableList()
 
         var effectsTransferred = 0
         while (effectsTransferred < numEffectsTransferred &&
@@ -71,10 +73,12 @@ object EssenceShift : BattleAction {
         ) {
             val effect = (effectsToSteal + effectsToTransfer).random()
             if (effect in effectsToSteal) {
+                effectsToSteal.remove(effect)
                 target.statusEffects.remove(effect)
                 actor.statusEffects.add(effect)
                 effect.battlerId = actor.id
             } else {
+                effectsToTransfer.remove(effect)
                 actor.statusEffects.remove(effect)
                 target.statusEffects.add(effect)
                 effect.battlerId = target.id

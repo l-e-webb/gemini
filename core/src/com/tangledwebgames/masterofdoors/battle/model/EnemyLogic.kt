@@ -262,14 +262,14 @@ fun getPlayerTarget(
                 weight += 5f
             }
             if (it.isAffectedBy(STEALTH_EFFECT_ID)) {
-                weight *= 5f / it.precision.coerceAtLeast(5)
+                weight *= 2.5f / it.precision
             }
             battle.playerBattlers.firstOrNull { other ->
                 other != it &&
                         other.isAlive() &&
                         other.isAffectedBy(GUARDING_STATUS_EFFECT_ID)
             }?.let { guardingBattler ->
-                weight *= 5f / guardingBattler.precision.coerceAtLeast(5)
+                weight *= 2.5f / guardingBattler.precision
             }
             it.id to weight
         }

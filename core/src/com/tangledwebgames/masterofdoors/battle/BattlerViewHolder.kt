@@ -5,9 +5,9 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.ColorAction
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.utils.Align
 import com.tangledwebgames.masterofdoors.*
 import com.tangledwebgames.masterofdoors.UiConstants.PADDING_MEDIUM
@@ -35,8 +35,8 @@ fun battlerView(
     viewHolder.rootTable.apply {
         row()
         actor(viewHolder.statusEffectGroup) {
-            it.height(0f).bottom().fillX()
-            wrap().pad(UiConstants.PADDING_SMALL).left().bottom().space(UiConstants.PADDING_SMALL)
+            it.height(0f).bottom().left()
+            pad(PADDING_SMALL).space(PADDING_SMALL).left().bottom().columnLeft().columnBottom()
         }
 
         row()
@@ -94,7 +94,7 @@ class BattlerViewHolder(
             "Mana: $current / $max"
         }
     ),
-    val statusEffectGroup: HorizontalGroup = HorizontalGroup(),
+    val statusEffectGroup: VerticalGroup = VerticalGroup(),
     val tintOverlay: Image = Image(skin, "progress-bar-c")
 ) {
     var name: String by nameLabel.textProperty()
@@ -126,7 +126,7 @@ class BattlerViewHolder(
         statusEffectGroup.clear()
         statusEffects.map { statusEffect ->
             statusEffect.duration?.let {
-                "${statusEffect.name} [$it]"
+                "${statusEffect.name} [$it turns]"
             } ?: statusEffect.name
         }.forEach { statusEffectText ->
             statusEffectGroup.addActor(Label(statusEffectText, skin))
