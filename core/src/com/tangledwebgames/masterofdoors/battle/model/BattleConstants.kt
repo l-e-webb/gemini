@@ -13,10 +13,10 @@ object BattleConstants {
     const val INCOMING_DAMAGE_DOWN_ID = "incoming_damage_down"
 
     val MANA_REGEN_RATIO = 1 to 5
-    const val PLAYER_BONUS_HEALTH = 50
+    const val PLAYER_BONUS_HEALTH = 75
     const val PLAYER_BONUS_MANA = 20
 
-    const val ATTACK_DEFENSE_RATIO_EXPONENT = 0.75f
+    const val ATTACK_DEFENSE_RATIO_EXPONENT = 0.7f
 
     const val ATTACK_GEMINUS_FORM_TURNS = 4
 

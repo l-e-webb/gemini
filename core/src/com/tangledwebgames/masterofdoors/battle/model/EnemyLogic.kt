@@ -197,10 +197,7 @@ fun determineSupportGeminusAction(
         if (!attackGeminus.isAffectedBy(DAMAGE_UP_ID)) {
             possibleBuffs.add(PowerSurge)
             possibleBuffs.add(PowerSurge)
-        }
-        if (!attackGeminus.isAffectedBy(INCOMING_DAMAGE_DOWN_ID)) {
-            possibleBuffs.add(ConjureArmor)
-            possibleBuffs.add(ConjureArmor)
+            possibleBuffs.add(PowerSurge)
         }
         if (attackGeminus.statusEffects.any {
                 it.id in Dispel.curedEffectIds
@@ -212,10 +209,13 @@ fun determineSupportGeminusAction(
         }
     }
 
-    return if (Random.nextFloat() < 0.66f) {
-        EnergyBolt to getPlayerTarget(battle)
-    } else {
-        Attack to getPlayerTarget(battle)
+    val s = Random.nextFloat()
+    return when {
+        s < 0.33f -> ToxicCloud to getPlayerTarget(battle) {
+            !it.isAffectedBy(POISON_ID)
+        }
+        s < 0.66f -> EnergyBolt to getPlayerTarget(battle)
+        else -> Attack to getPlayerTarget(battle)
     }
 }
 

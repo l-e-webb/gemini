@@ -104,7 +104,7 @@ class StatusView(val includeSelectionArrows: Boolean = false) {
                     label("Spriit + Finesse + Agression", "stat-value")
 
                     row().fillX().uniformY().top()
-                    label("Resource required to use skills. Regenerates by 25% of max value every turn.") {
+                    label("Resource required to use skills. Regenerates by 20% of max value every turn.") {
                         wrap = true
                     }
                     label("Increases damage dealt by magic skills.") {

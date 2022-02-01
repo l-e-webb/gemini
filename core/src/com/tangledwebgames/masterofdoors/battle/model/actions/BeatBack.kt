@@ -19,7 +19,7 @@ object BeatBack : BattleAction {
     override val targetType: BattleAction.TargetType = BattleAction.TargetType.SINGLE
     override val description: String
         get() = """
-        Physical attack which greatly reduces the target's attack for one turn. Damage is reduces by 50% - 100% based on Precision vs Precision check.
+        Physical attack which greatly reduces the target's attack for one turn. Damage is reduces by 25% - 75% based on Precision vs Precision check.
         Base power: $baseDamage
     """.trimIndent()
     val baseDamage: Int = Attack.baseDamage
@@ -65,9 +65,9 @@ object BeatBack : BattleAction {
                 difficulty = target.precision
             )
             val damageDownRate: Pair<Int, Int> = when {
-                precisionCheck <= 0 -> 2 to 4
-                precisionCheck <= 4 -> 1 to 4
-                else -> 0 to 4
+                precisionCheck < 0 -> 3 to 4
+                precisionCheck < 3 -> 2 to 4
+                else -> 1 to 4
             }
             target.statusEffects.firstOrNull { it.id == BEAT_BACK_STATUS_ID }
                 ?.let { effect ->
