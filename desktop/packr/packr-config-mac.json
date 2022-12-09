@@ -1,0 +1,12 @@
+{
+  "platform": "mac",
+  "jdk": "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home",
+  "executable": "gemini_mac",
+  "classpath": ["desktop/build/libs/desktop-1.0.jar"],
+  "mainclass": "com.tangledwebgames.masterofdoors.desktop.DesktopLauncher",
+  "vmargs": [
+    "Xms128m", "Xmx1500m"
+  ],
+  "resources": ["core/assets"],
+  "output": "desktop/build/dist/mac/gemini.app"
+}
